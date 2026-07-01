@@ -127,13 +127,13 @@ in k8s the lowest level of deployment is POD. Pod is just like a wraper to our c
 
    🔹 Route Controller
 
-      Manages cloud routing rules
+        Manages cloud routing rules
 
-    🔹 Volume Controller
+   🔹 Volume Controller
 
        Attaches / detaches cloud disks
 
-        Example: EBS, Azure Disk, Persistent Disk
+       Example: EBS, Azure Disk, Persistent Disk
 
    🧠 Easy way to remember
 
@@ -179,7 +179,7 @@ in k8s the lowest level of deployment is POD. Pod is just like a wraper to our c
       ------------------
        * in k8s we will use "Docker shim", Container D, Cri-O or any other container runtimes which implement k8s container interface.
          
-    3. Kube-Proxy:
+   3. Kube-Proxy:
        -----------
        * it will provide networking, IP address to pods and load balacing in k8s. it will usese Ip tables in linux machine.
       
