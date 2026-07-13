@@ -4,7 +4,7 @@ In this section we can discuss:
 
    
 
-1)  Aws EKS Cluster Authentication & Autherizatio :
+*  Aws EKS Cluster Authentication & Autherizatio :
 --------------------------------------------------
 The below steps will we need to perform in the users mechine who need access to AWS eks cluster:
 who create the EKS cluster by default that iam user will be add in Cluster "IAM ACCESS ENTRIES".
