@@ -2,6 +2,8 @@ In this section we can discuss:
 1) Aws EKS Cluster Authentication & Autherizatio 
 2) How to connected multiple clusters from User Mechine.
 
+   
+
 1)  Aws EKS Cluster Authentication & Autherizatio :
 --------------------------------------------------
 The below steps will we need to perform in the users mechine who need access to AWS eks cluster:
@@ -35,7 +37,65 @@ who create the EKS cluster by default that iam user will be add in Cluster "IAM 
 * now we can run the kubectl command to see the output. But still we are unable to see cluster resouces. Why ?
 * Because the IAM user have only access to AWS console so user can see the resources in the AWS console. But if he want to acces the Aws EKS cluster he can't.
 * For Aws EKS clutser Access we have to add that IAM user in Cluster "IAM access entries"
-* 
+*  If we want to check Which user is configured in the mechine:
+   aws sts get-caller-identity
+   Result: we see UserID, Account, Arn of the user.
+*  we can give IAM access entries in two ways:
+   1. EKS API
+   2. EKS API and ConfigMap
+*  How to Provide cluster access to the IAM user.
+   1. click in create access entry
+   2. provide IAM user Arn
+   3.Type: Standerd
+   4. Policy name: select cluster policy
+   5. Acees scope: cluster or namesapce
+   6. create
+*  Bases on the policy added in the access entry user is able to Authorisation the cluster.
+
+Now we can see How to connects Multiple EKS Clusters:
+======================================================
+ 
+1. who we can see how many clusters(contexts) configured or connected to our mechine ?
+A. Command: kubectl config get-contexts
+   Result: we can clusters details connected to our mechine.
+
+
+ok we know some of the clusters connected to our mechine.now i want to which cluster my mechine getting the detsils.
+
+2. How we can find from which cluster my mechine is fetching all the details ?
+A. Commad: kubectl config current-context
+   Result: it will show to which EKS cluster our mechine is pointing to fetch the details.
+
+3. if you want to see mechine pointing cluster info:
+   Command: cat config
+
+if you want to mange multiple clusters from you'r mechine:
+1. we have to add that cluster details to our config file.
+   Command: aws eks update-kubeconfig --region cluster_region --name cluster_name
+   
+2. At the time of adding the cluster in config file we can set alias name for our cluster.
+A. Command: aws eks update-kubeconfig --region cluster_region --name cluster_name --alias our_own_name.
+
+
+3. How to fetch details from another cluster which is configured in config file ?
+A. command: kubectl --context=cluster/alias_name get all
+
+By using the above command we always tells kubectl to point to specific cluster to get the details.
+
+4. if you want to swith to another cluster which is configured in the config file ?
+A. Command: Kubectl config use-context cluster/alias_name
+
+so in kubectl commands we no need to provide cluster details.
+
+ 
+ 
+ 
+
+
+
+
+
+
    
 
 
