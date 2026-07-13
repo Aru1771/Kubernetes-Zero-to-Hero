@@ -63,27 +63,27 @@ A. Command: kubectl config get-contexts
 ok we know some of the clusters connected to our mechine.now i want to which cluster my mechine getting the detsils.
 
 2. How we can find from which cluster my mechine is fetching all the details ?
-A. Commad: kubectl config current-context
+   Commad: kubectl config current-context
    Result: it will show to which EKS cluster our mechine is pointing to fetch the details.
 
 3. if you want to see mechine pointing cluster info:
-   Command: cat config
+     Command: cat config
 
 if you want to mange multiple clusters from you'r mechine:
 1. we have to add that cluster details to our config file.
    Command: aws eks update-kubeconfig --region cluster_region --name cluster_name
    
 2. At the time of adding the cluster in config file we can set alias name for our cluster.
-A. Command: aws eks update-kubeconfig --region cluster_region --name cluster_name --alias our_own_name.
+    Command: aws eks update-kubeconfig --region cluster_region --name cluster_name --alias our_own_name.
 
 
 3. How to fetch details from another cluster which is configured in config file ?
-A. command: kubectl --context=cluster/alias_name get all
+    command: kubectl --context=cluster/alias_name get all
 
 By using the above command we always tells kubectl to point to specific cluster to get the details.
 
 4. if you want to swith to another cluster which is configured in the config file ?
-A. Command: Kubectl config use-context cluster/alias_name
+    Command: Kubectl config use-context cluster/alias_name
 
 so in kubectl commands we no need to provide cluster details.
 
