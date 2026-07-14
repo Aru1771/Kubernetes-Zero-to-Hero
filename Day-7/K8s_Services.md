@@ -38,7 +38,20 @@ to expose our app to outside world. we have 3 main types.
 1. cluster ip: if you use this we can access app only inside the cluster
 2. nodepot: if we use this we can access the app with in the organization. simply how have access to vpc.
 3. load balacer: by using this we can get one elastic ip addreess. with the ip we can access it from out side.
-4. 
+
+
+we can expose our application in 3 ways:
+=========================================
+
+1. cluster IP: we can access app inside the cluster.
+2. NodePort: we can access the app with in the VPC.
+3. LoadBalancer: we can access the app from the external world.
+
+if we are using minikune for nodeport we have to do port forwording. 
+
+Kubeshark to see the traffic flow in the our cluster
+
+
 
  
 
