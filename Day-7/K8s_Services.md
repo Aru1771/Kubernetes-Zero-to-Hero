@@ -54,12 +54,23 @@ Kubeshark to see the traffic flow in the our cluster
 
 
  
+if you in minikube and you have exposed a servive with nord port:
+--------------------------------------------------------------------
 
+so we have to port forwording mechanisam for that we have to do port forwording:
 
+Command: kubectl port-forwording --address 0.0.0.0 svc/service_name <local_port>:<service_port>
 
- 
+Eg:
+Port-forward a Service
 
+kubectl port-forward svc/python-service 8080:80
+8080 → Local port on your machine
+80 → Service port
 
+Access:
+
+http://localhost:8080
    
 
    
