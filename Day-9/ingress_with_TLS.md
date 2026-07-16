@@ -41,6 +41,32 @@ but few ingress controller sit outside the cluster like (F5) and send the traffi
 
 
 
+Now i want implement ingress controller on the minikube.
+==========================================================
+
+Step:1 in kubernets cluster create an ingress.yaml with "host", "service name" and "service IP"
+
+step:2 open the url https://v1-32.docs.kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/ ---> officail documentation provided by k8s.
+
+Step:3 follow the steps and enable the ingress.
+
+check the ingress pods are running or not for that:
+---------------------------------------------------
+
+Command: kubectl get pods -n ingress_namespace
+
+if you want to check the ingress.yaml file is identified by ingress controller or not:
+-----------------------------------------------------------------------------------
+
+Command: kubectl logs ingress_pod -n ingress_namespace
+
+step:4 In minikube additionally we have to one more setup:
+----------------------------------------------------------
+why we are doing this because this domine is not purchased any domine providers. it a dummy domins this domine have no ip so we are adding this bummy host name with ingress address ip in the 
+we have to update /ect/hosts---> vim /etc/hosts--> Ingress_address Hostname
+
+
+
 
 
  
