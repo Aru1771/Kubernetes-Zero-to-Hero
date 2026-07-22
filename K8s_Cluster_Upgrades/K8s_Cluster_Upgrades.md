@@ -51,12 +51,51 @@ Technical Prerequisites:
 
 Process of Upgrading EKS Cluster:
 ----------------------------------
+Step:1 Managed Control plane upgrade  --->(time: 30min)
+-------------------------------------
+Note: one thing to remember our EKS is managed cluster means Aws will take care about Control plain components and high availability, desaster recovery, security and scaling of API server.
+      "but it will Not manage control plane upgradations"
 
-Note: one thing to remember our EKS is managed cluster means Aws will take care about Control plain components and high availability.
-      "Not for control plane upgradations"
+1. For Managed Control Plane upgrades we can do it via (UI, eksctl, aws cli).
+2. once we click in update on UI or fire any eksctl commands then AWS will takecare of upgrading the CP.
 
-For Managed Control Plane upgrades we can do it via (UI, eksctl, aws cli).
-once we click in update on UI or fire any eksctl commands then AWS will takecare of upgrading the CP.
+Step:2 Node Group Upgrade or Nodes or Fargate ---> (time based on node count)
+-----------------------------------------------------------------------------
+1. Managed Node Groups: it was managed by AWS. by using eksctl command we can create Node Groups launch template. 
+
+with Mnaged Node Groups the upgration was simple just we have to select "Rollout" option. the the managed k8s service will go to Node group and upgrade node by node. if you have more than 100+ node this approch us better
+
+2. Nodes: Managed by own for this we have create one custome launch template or they will create ec2 instances and attach them.
+
+
+This is very tricey process:
+1. cordon the node: means make the node unshadulable.
+2. upgrade that node
+
+
+
+
+3. Hybrid: combination of above two
+
+
+
+
+step3: Addond Upgrade:---> (time based on addons count)
+-------------------------------------------------------
+like Kube-proxy, VPC CNI 
+
+
+One Cooman QA:
+--------------
+
+Q) i have installed HELM, prometheus, ArgoCD do i need to stop all of them at the time of upgrade ?
+
+A) to make sure we have to verify they are working or not after upgrade. so every prod upgrade we 
+  have to updrade lower environment and make sure thay are working fine are not.
+
+
+  
+
 
 
 
