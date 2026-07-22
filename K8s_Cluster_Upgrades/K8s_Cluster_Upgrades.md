@@ -63,7 +63,13 @@ Step:2 Node Group Upgrade or Nodes or Fargate ---> (time based on node count)
 -----------------------------------------------------------------------------
 1. Managed Node Groups: it was managed by AWS. by using eksctl command we can create Node Groups launch template. 
 
-with Mnaged Node Groups the upgration was simple just we have to select "Rollout" option. the the managed k8s service will go to Node group and upgrade node by node. if you have more than 100+ node this approch us better
+with Mnaged Node Groups the upgration was simple just we have to select "Rollout" option. the the managed k8s service will go to Node group and upgrade node by node. if you have more than 100+ node this approch us better.
+
+the upgrade involves in lauch templates or AMI. 
+if we are using our own launch templates it's our responsible to upgrade launch template.
+if we are using Custome AMI it's our responsible to build custome AMI.
+if we using the AMI provided by AWS in this case we just click in Upgrade.--> update stretegy--> "  Rolling Update"
+
 
 2. Nodes: Managed by own for this we have create one custome launch template or they will create ec2 instances and attach them.
 
@@ -95,6 +101,11 @@ A) to make sure we have to verify they are working or not after upgrade. so ever
 
 
   
+
+By the end of the Day our QA team have functional testing script on upgraded version.
+
+no need to go with individual componenets.
+
 
 
 
