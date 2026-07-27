@@ -51,3 +51,16 @@ subjects:
   namespace: cicd
 
 Now only the jenkins ServiceAccount gets these permissions.
+
+Why not use the default ServiceAccount?
+------------------------------------------------------------
+Many beginners deploy applications using:
+
+default
+
+This is a bad practice because multiple applications end up sharing the same identity and permissions.
+
+Production rule:
+
+One application = One ServiceAccount.
+Give each ServiceAccount only the permissions it needs.
