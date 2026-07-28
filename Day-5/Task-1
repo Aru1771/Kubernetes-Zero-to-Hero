@@ -4,13 +4,21 @@ Document what you learned from the video in a blog, embed the video, and include
 Task 1
 -------
 Create a pod using the imperative command and use nginx as the image
+
+Cmd: kubectl run pod_name --image=nginx:lates
 Task2
 ------
 Create the YAML from the nginx pod created in task 1
-Update the pod name in the YAML
-Use that YAML to create a new pod with the name nginx-new.
-Task3
+cmd: kubectl run task_1_pod_name --image:nginx:latest -o yaml
 
+Update the pod name in the YAML
+cmd: kubectl run nginx-pod --image=nginx:latest --dry-run=client -o yaml > new_pod.yaml
+
+Use that YAML to create a new pod with the name nginx-new.
+cmd: kubectl create -f  new_pod.yaml
+
+Task3
+-----
 Apply the below YAML and fix the errors, including all the commands that you run during the troubleshooting and the error message
 apiVersion: v1
 kind: Pod
