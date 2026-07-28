@@ -20,6 +20,34 @@ First Understand the declarative manifest file in normal programing language sec
 * spec: block is like a dictionary in yaml file.it will hold key value pairs
 * if you give the values with (-) then it will consider like a list    
 
+
+Now we can see how to run a Pod in imperative way:
+--------------------------------------------------
+kubectl run pod_name --image=image_name:tag
+
+Now we can see how to run a Pod in declarative way:
+----------------------------------------------------
+
+In declarative we have 4 main components:
+1. apiversion
+2. kind
+3. metadata
+4. spec
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    
 
    
