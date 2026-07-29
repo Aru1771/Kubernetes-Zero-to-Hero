@@ -177,7 +177,10 @@ ExternalName you can refer from doxs.
 -------------------------------------
 
    
+without yaml file if you want to expose a service:
+--------------------------------------------------
 
+cmd: kubeclt expose rc/deply/rs name_of_rc/rs/deply --port=80 --target-port=8081
    
 
     
