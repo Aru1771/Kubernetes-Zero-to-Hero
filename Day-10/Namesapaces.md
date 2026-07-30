@@ -1,4 +1,4 @@
-NameSpaces:
+NameSpaces: 
 =============
 
 In k8s cluster if you want to isolate the objects/ resources like pods, services etc.. then we have to use Namespaces.
