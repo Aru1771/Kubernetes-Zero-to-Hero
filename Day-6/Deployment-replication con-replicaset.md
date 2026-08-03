@@ -105,10 +105,12 @@ replication controller is a legacy version
 cmd: kubectl create -f rs.yaml
 
 * we can make the changes of the objects in yaml file or a live objects.
+  
 * if you want to do in live object:
   ---------------------------------
    kubectl edit rs first-rs
 * by modifiny the objects in live we no need to apply to it will automatically reflect
+  
 * if you want to sclae up the pods in rs with imparative way:
   -------------------------------------------------------------
    kubectl scale --replicas=10 rs first-rs
