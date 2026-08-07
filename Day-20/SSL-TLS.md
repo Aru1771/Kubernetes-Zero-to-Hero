@@ -47,4 +47,18 @@ Case: 3 Certiface comes in to role:
 1. How server will get the certificate ?
 A.server will get by CSR(Certificate sighing requet)
 
-* this request is signed by CA organization before sign the certificate this CA will check the requested company, website and send the certificate to server with public and private key.
+* this request is signed by CA organization before sign the certificate this CA will check the requested company, website and send the        certificate to server with public and private key.
+* private key will stored in server.
+* public key will sent to user browser.
+
+Note:
+-----
+This above scenarios is mainly used fro public domines which are available over the internet.
+
+
+Now what about for internally organized domines:
+-------------------------------------------------
+
+
+* for that we actually use a custom CA that are hosted with in our organization to sign the custome certificates.
+* this is responsible fro issueing and signing the certificates.
