@@ -32,7 +32,7 @@ spec:
 
 
 * How the above manifest will work ?
-  first it will create a init container and the creation of the init container will stay in pending untill the condiation which we mentioned in the init container will satisfied.
+  first it will create a init container and the creation of the init container will stay in pending untill the condiation which we mentioned in the init container   will satisfied.
   once the condition is satisfied inti container will come to runnig state and app conatiner will start.
 
   in this case our condition is to do nslookup on the service. so once the service is reachable the condition will satisfy.
