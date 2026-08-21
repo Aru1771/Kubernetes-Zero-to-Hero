@@ -19,27 +19,27 @@ Kubernetes works similarly.
 
 Instead of an Aadhaar card, it uses a Client Certificate.
 
-You
- │
- │ Show Identity Proof
- ▼
-Bank
- │
-Verifies
- │
-Access Granted
+      You
+       │
+       │ Show Identity Proof
+       ▼
+      Bank
+       │
+      Verifies
+       │
+      Access Granted
 
 Kubernetes:
 
-kubectl
-      │
-Client Certificate
-      │
-API Server
-      │
-Verifies Certificate
-      │
-Authenticated
+    kubectl
+          │
+    Client Certificate
+          │
+    API Server
+          │
+    Verifies Certificate
+          │
+    Authenticated
 
 Step 2: What is a Certificate?
 ------------------------------
@@ -47,29 +47,29 @@ A certificate is a digital identity card.
 
 It contains information like:
 
-Owner Name
-
-Public Key
-
-Issuer
-
-Expiry Date
-
-Signature
+    Owner Name
+    
+    Public Key
+    
+    Issuer
+    
+    Expiry Date
+    
+    Signature
 
 Example:
 
-Subject:
-CN=aravind
-
-Issuer:
-Kubernetes CA
-
-Valid From:
-2026
-
-Valid To:
-2027
+    Subject:
+    CN=aravind
+    
+    Issuer:
+    Kubernetes CA
+    
+    Valid From:
+    2026
+    
+    Valid To:
+    2027
 
 Step 3: What is a CA (Certificate Authority)?
 ---------------------------------------------
@@ -78,19 +78,19 @@ Imagine your company issues employee ID cards.
 
 Only IDs issued by the company are trusted.
 
-Company HR
-      │
-Issues Employee ID
-      │
-Employee
+   Company HR
+         │
+   Issues Employee ID
+         │
+   Employee
 
 In Kubernetes:
 
-Certificate Authority (CA)
-        │
-Signs Certificate
-        │
-Trusted User
+     Certificate Authority (CA)
+             │
+     Signs Certificate
+             │
+     Trusted User
 
 The CA is the root of trust.
 
@@ -111,7 +111,7 @@ API Server
 
 Checks:
 
-Was this certificate signed by MY CA?
+     Was this certificate signed by MY CA?
 
 If:
 
@@ -131,7 +131,8 @@ Step 5: Important Certificates
 A Kubernetes cluster contains many certificates.
 
 1. CA Certificate
-ca.crt
+
+         ca.crt
 
 Purpose:
 
@@ -140,7 +141,9 @@ Signs every Kubernetes certificate.
 Think of it as the Principal's signature on school certificates.
 
 2. API Server Certificate
-apiserver.crt
+
+
+       apiserver.crt
 
 Used by:
 
@@ -154,11 +157,11 @@ Proves to clients that this really is the Kubernetes API Server.
 
 Example:
 
-admin.crt
+      admin.crt
 
 Used by:
 
-kubectl
+     kubectl
 
 Purpose:
 
@@ -312,7 +315,7 @@ Authentication Failed
 The request never reaches RBAC.
 
 Step 11: Commands Every DevOps Engineer Should Know
-
+---------------------------------------------------------
 View certificates:
 
 ls /etc/kubernetes/pki
