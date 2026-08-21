@@ -11,23 +11,23 @@ Before Kubernetes v1.24
 
 Whenever you created a ServiceAccount:
 
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: app-sa
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: app-sa
 
 Kubernetes automatically created a Secret containing a ServiceAccount token.
 
-ServiceAccount
-      │
-      ▼
-+----------------------------+
-| app-sa-token-x7m2k         |
-|----------------------------|
-| token                      |
-| ca.crt                     |
-| namespace                  |
-+----------------------------+
+        ServiceAccount
+              │
+              ▼
+        +----------------------------+
+        | app-sa-token-x7m2k         |
+        |----------------------------|
+        | token                      |
+        | ca.crt                     |
+        | namespace                  |
+        +----------------------------+
 
 You could verify it with:
  
@@ -36,14 +36,16 @@ You could verify it with:
 
 Example output:
 
-NAME                    TYPE
-app-sa-token-x7m2k      kubernetes.io/service-account-token
+      NAME                    TYPE
+      app-sa-token-x7m2k      kubernetes.io/service-account-token
 
 Problem with Old Tokens
 ---------------------------
 These tokens had several security issues.
 
-Problem 1: Never Expired: The token remained valid indefinitely.If someone stole it, they could continue using it until it was manually revoked.
+Problem 1: 
+
+    Never Expired: The token remained valid indefinitely.If someone stole it, they could continue using it until it was manually revoked.
 
 
 Created Today
@@ -60,17 +62,21 @@ Still valid after
 
 
 
-Problem 2: Stored as a Secret: The token was stored in etcd as a Secret.Anyone with permission to read that Secret could authenticate as the ServiceAccount.
+Problem 2: 
+
+      Stored as a Secret: The token was stored in etcd as a Secret.Anyone with permission to read that Secret could authenticate as the ServiceAccount.
 
 
-Problem 3: Easy to Leak: Developers sometimes copied the token into
+Problem 3: 
 
-Developers sometimes copied the token into:
+    Easy to Leak: 
 
-Git repositories ❌
-CI/CD variables ❌
-Documentation ❌
-Slack messages ❌
+          Developers sometimes copied the token into:
+          
+          Git repositories ❌
+          CI/CD variables ❌
+          Documentation ❌
+          Slack messages ❌
 
 Since the token never expired, it created a long-term security risk.
 
@@ -82,19 +88,19 @@ Kubernetes introduced the TokenRequest API.
 Instead of storing a permanent token, the API Server now creates short-lived tokens on demand.
 
 
-ServiceAccount
-
-↓
-
-TokenRequest API
-
-↓
-
-Temporary JWT Token
-
-↓
-
-Expires Automatically
+      ServiceAccount
+      
+      ↓
+      
+      TokenRequest API
+      
+      ↓
+      
+      Temporary JWT Token
+      
+      ↓
+      
+      Expires Automatically
 
 
 This is much more secure.
@@ -112,7 +118,7 @@ kubectl create token demo-sa
 
 Example output:
 
-eyJhbGciOiJSUzI1NiIsImtpZCI6...
+      eyJhbGciOiJSUzI1NiIsImtpZCI6...
 
 This is a JWT (JSON Web Token).
 
@@ -124,11 +130,11 @@ Specify Token Lifetime
 
 You can request a custom duration:
 
-kubectl create token demo-sa --duration=30m
+      kubectl create token demo-sa --duration=30m
 
 or
 
-kubectl create token demo-sa --duration=2h
+      kubectl create token demo-sa --duration=2h
 
 Example:
 
@@ -143,6 +149,7 @@ Requested
 Automatically expires
 
 Note: The API server may enforce a maximum lifetime. If you request a longer duration than allowed, it can return a shorter-lived token.
+      Means: But the Kubernetes API server has a maximum allowed token lifetime configured by the cluster administrator.
 
 Where is the Token Stored?
 
@@ -165,6 +172,30 @@ No Secret Created
 kubectl get secrets
 
 On Kubernetes v1.24+ you typically won't see a ServiceAccount token Secret created automatically.
+
+So where is the token stored?
+
+This is the important part.
+
+When a Pod uses a ServiceAccount, Kubernetes makes the token available inside the Pod's filesystem.
+
+Typically:
+
+      /var/run/secrets/kubernetes.io/serviceaccount/token
+
+For example:
+
+      kubectl exec -it mypod -- cat /var/run/secrets/kubernetes.io/serviceaccount/token
+
+You will see the JWT token.
+
+There are usually three important files:
+
+      /var/run/secrets/kubernetes.io/serviceaccount/
+      │
+      ├── token
+      ├── ca.crt
+      └── namespace
 
 Real Production Example
 -------------------------
