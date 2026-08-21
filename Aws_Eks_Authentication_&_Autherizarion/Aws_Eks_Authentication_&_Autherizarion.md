@@ -56,7 +56,7 @@ who create the EKS cluster by default that iam user will be add in Cluster "IAM 
 Now we can see How to connects Multiple EKS Clusters:
 ======================================================
  
-1. who we can see how many clusters(contexts) configured or connected to our mechine ?
+1. how we can see how many clusters(contexts) configured or connected to our mechine ?
 A. Command: kubectl config get-contexts
    Result: we can clusters details connected to our mechine.
 
