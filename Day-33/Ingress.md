@@ -17,6 +17,27 @@
   1. Ingress--------------------> Yaml file.
   2. Ingress controller --------> it will read the ingress yaml files.
   3. Load Balancer -------------> it is created by the Ingress controller.
-  
+ 
+ Note:
+
+       According to the ingress resource(ingress.yaml) file which we have created in our k8s. Based on that the ingress controller will create the Load balancer 
+       with thet specifications mentioned in the ingress resource.
+
+
+ Step:1 
+ ------
+
+ 1. create deployment
+ 2. create a servive for deployment
+ 3. create a ingress resource with hostname and path, ingressClassName then only nginx ingress controller will found the ingress file and specifications.
+ 4. install nginx ingress controller from official website.
+ 5. once it was installed it fill find the valid ingressclassname in the yaml file and the ingress controller will point out to that yaml file configration.
+ 6. if you're using a Kubeadm cluster we have to install a cloud-controller component in our kubeadm cluster.
+ 7. Then only the cloud-controller manager will create a ALB/NLB in our cloud.
+ 8. This cloud-controller manager will watch the services type Load Balance and it will create a ALB in the cloud.
+ 9. if you see the external ip of the ingress controller services is in pending then the above one is the reason.
+ 10. the hostname was not resolving we have to add host name with nodeport to resolve the host name. becuase we changes ingress services to nodeip type from    loadbalnacer
+      
+
 
  
