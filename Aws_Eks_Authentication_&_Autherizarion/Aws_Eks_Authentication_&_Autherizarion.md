@@ -21,6 +21,7 @@ who create the EKS cluster by default that iam user will be add in Cluster "IAM 
   YOU CAN CONFIGURE CREDENTIALS BY RUNNING "aws configure"
 * So first we have to create a user in AWS IAM.
 * At the time creating user in AWS IAM console what are permissions we are providing to user is only applyed at AWS console level. not applied to AWS EKS cluster.
+  Means if you provide EKS access at the console leavel he will able to see the cluster but he will not able to access it.
 * Once we have creted the user we have to create "Access key" and "secret access key".
 * now again come to user mechine and configure these key's by using the command:
    Commad: aws configure
