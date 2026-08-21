@@ -5,28 +5,30 @@ Learning Objectives
 -------------------
 By the end of this topic, you'll understand:
 
-Why Bound Service Account Tokens were introduced
-How Pods automatically receive tokens
-Where the token is stored inside a Pod
-How Kubernetes automatically rotates (refreshes) the token
-Difference between old tokens and bound tokens
-How this forms the foundation of IRSA
+* Why Bound Service Account Tokens were introduced
+* How Pods automatically receive tokens
+* Where the token is stored inside a Pod
+* How Kubernetes automatically rotates (refreshes) the token
+* Difference between old tokens and bound tokens
+* How this forms the foundation of IRSA
 
 First, let's understand the problem.
 
 Suppose we have a ServiceAccount:
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: app-sa
+
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: app-sa
 
 And a Pod:
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx
-spec:
-  serviceAccountName: app-sa
+
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx
+    spec:
+      serviceAccountName: app-sa
 
 
 Question:
@@ -49,38 +51,38 @@ Before Kubernetes v1.24
 ------------------------
 When you created the ServiceAccount:
 
-ServiceAccount
-
-↓
-
-Kubernetes automatically created Secret
-
-↓
-
-Permanent JWT Token
-
-↓
-
-Pod mounted Secret
+    ServiceAccount
+    
+    ↓
+    
+    Kubernetes automatically created Secret
+    
+    ↓
+    
+    Permanent JWT Token
+    
+    ↓
+    
+    Pod mounted Secret
 
 Example:
 
-ServiceAccount
-      │
-      ▼
-Secret
-app-sa-token-ab123
-
-      │
-      ▼
-Mounted inside Pod
+    ServiceAccount
+          │
+          ▼
+    Secret
+    app-sa-token-ab123
+    
+          │
+          ▼
+    Mounted inside Pod
 
 Problems:
 
-Token never expired
-Token stored as Secret
-Easy to steal
-No automatic rotation
+    Token never expired
+    Token stored as Secret
+    Easy to steal
+    No automatic rotation
 
 Kubernetes Improved This
 -------------------------
@@ -88,27 +90,301 @@ Instead of creating a Secret, Kubernetes now creates a Bound Service Account Tok
 
 The flow is:
 
-Pod Created
+    Pod Created
+        ↓
+    Kubelet
+        ↓
+    TokenRequest API
+        ↓
+    API Server
+        ↓
+    Short-lived JWT
+        ↓
+    Kubelet
+        ↓
+    Mounted into Pod
+        ↓
+    Token Rotation
 
-↓
 
+1. Pod is created
+
+Suppose you create this Pod:
+    
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: myapp
+    spec:
+      serviceAccountName: myapp-sa
+      containers:
+      - name: app
+        image: nginx
+
+You are saying:
+
+"Run this Pod using the myapp-sa ServiceAccount."
+
+So the relationship is:
+
+Pod
+ ↓
+myapp-sa
+
+2. Kubelet gets involved
+
+The Pod is scheduled to a worker node.
+
+For example:
+
+        Kubernetes Cluster
+        
+        
+        Worker Node
+            ↓
+        Kubelet
+            ↓
+        Pod: myapp
+
+The kubelet is responsible for managing the Pod on that worker node.
+
+It sees:
+
+      Pod → ServiceAccount = myapp-sa
+
+and knows that the Pod needs a ServiceAccount token.
+
+3. Kubelet requests a token
+
+The kubelet communicates with the Kubernetes API server.
+
+It uses the TokenRequest API.
+
+Conceptually:
+
+Kubelet
+   |
+   | "Give me a token for myapp-sa
+   |  for this Pod"
+   ↓
 API Server
 
-↓
+The request contains information such as:
 
-TokenRequest API
+ServiceAccount = myapp-sa
+Namespace = dev
+Pod identity
+Requested expiration
 
-↓
+4. API Server creates the JWT
 
-Temporary JWT
+The API server validates the request.
 
-↓
+If everything is valid, Kubernetes creates a short-lived JWT.
 
-Mounted into Pod
+For example:
 
-↓
+JWT
+│
+├── ServiceAccount identity
+├── Namespace
+├── Pod information
+├── Issuer
+└── Expiration time
 
-Automatically Refreshed
+Think of this token as:
+
+A temporary identity card for the Pod.
+
+For example:
+
+Token valid:
+10:00 AM → 11:00 AM
+
+The exact lifetime depends on the cluster's configuration and limits.
+
+5. API Server gives the token back to kubelet
+
+The API server doesn't directly put the token inside the container.
+
+Instead:
+
+API Server
+    ↓
+JWT
+    ↓
+Kubelet
+
+The kubelet receives the token.
+
+6. Kubelet mounts the token into the Pod
+
+Now the kubelet makes the token available inside the Pod.
+
+Typically you'll find it here:
+
+    /var/run/secrets/kubernetes.io/serviceaccount/token
+
+Inside the container:
+
+    cat /var/run/secrets/kubernetes.io/serviceaccount/token
+
+You would see something like:
+
+    eyJhbGciOiJSUzI1NiIs...
+
+That's the JWT.
+
+The Pod also normally gets:
+
+    /var/run/secrets/kubernetes.io/serviceaccount/
+    │
+    ├── token
+    ├── ca.crt
+    └── namespace
+
+So your application can use the token when communicating with the Kubernetes API server.
+
+
+7. Application uses the token
+
+Suppose your application inside the Pod wants to call:
+
+Kubernetes API Server
+
+It can use:
+
+    /var/run/secrets/kubernetes.io/serviceaccount/token
+
+The request looks conceptually like:
+
+      Application
+          ↓
+      JWT Token
+          ↓
+      API Server
+
+The API server checks:
+
+    Who are you?
+            ↓
+    ServiceAccount: myapp-sa
+    
+    
+    What are you allowed to do?
+            ↓
+    RBAC
+
+Then Kubernetes decides whether to allow the request.
+
+8. Token expires
+
+Now suppose the token was valid for 1 hour:
+
+    10:00
+      ↓
+    Token issued
+    
+    
+    10:30
+      ↓
+    Still valid
+    
+    
+    10:55
+      ↓
+    Kubelet prepares replacement
+    
+    
+    11:00
+      ↓
+    Old token expires
+
+The kubelet doesn't simply wait until the token becomes invalid.
+
+It requests a new token before expiration.
+
+      Old Token
+          ↓
+      Almost expired
+          ↓
+      Kubelet
+          ↓
+      TokenRequest API
+          ↓
+      API Server
+          ↓
+      New JWT
+          ↓
+      Kubelet
+          ↓
+      Token gets rotated
+
+This is called token rotation.
+
+Complete flow
+
+Put everything together:
+
+                Kubernetes API Server
+                         ↑
+                         |
+                   TokenRequest
+                         |
+                         |
+Pod Created → Kubelet ───┘
+                |
+                | receives JWT
+                ↓
+        Short-lived JWT
+                |
+                ↓
+      Mounted into Pod
+                |
+                ↓
+/var/run/secrets/kubernetes.io/serviceaccount/token
+                |
+                ↓
+       Application uses JWT
+                |
+                ↓
+        API Server validates
+                |
+                ↓
+             RBAC
+                |
+                ↓
+        Allow / Deny
+
+
+
+And when the token is close to expiration:
+
+      Token nearly expires
+              ↓
+      Kubelet requests new token
+              ↓
+      TokenRequest API
+              ↓
+      API Server
+              ↓
+      New JWT
+              ↓
+      Token rotated
+              ↓
+      Application continues working
+
+
+The 4 things I want you to remember
+
+        1. Kubelet requests the token — not the application directly.
+        2. API Server issues the short-lived JWT.
+        3. Kubelet makes the token available inside the Pod.
+        4. Kubelet automatically rotates the token before expiration.
+
+And importantly, this is why modern Kubernetes doesn't need to create a permanent myapp-sa-token-xxxxx Secret for every ServiceAccount.
+
+
 Notice something important.
 
 The token is created because the Pod needs it.
@@ -148,6 +424,8 @@ Pod A
 ↓
 
 JWT Token A
+
+
 Pod B
 
 ↓
@@ -167,12 +445,13 @@ Complete Authentication Flow
 Let's understand everything happening internally.
 
 Suppose you apply:
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx
-spec:
-  serviceAccountName: app-sa
+
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx
+    spec:
+      serviceAccountName: app-sa
 
 Internally Kubernetes performs:
 
