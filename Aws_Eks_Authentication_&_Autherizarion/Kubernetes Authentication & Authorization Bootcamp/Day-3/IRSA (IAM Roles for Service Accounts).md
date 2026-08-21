@@ -6,14 +6,14 @@ Learning Objectives
 --------------------
 By the end of this topic, you'll understand:
 
-Why IRSA was introduced
-Problems before IRSA
-How IRSA works internally
-OIDC Provider
-AWS STS (Security Token Service)
-Complete authentication flow
-Production implementation
-Interview questions
+* Why IRSA was introduced
+* Problems before IRSA
+* How IRSA works internally
+* OIDC Provider
+* AWS STS (Security Token Service)
+* Complete authentication flow
+* Production implementation
+* Interview questions
 
 What Problem Does IRSA Solve?
 ------------------------------
@@ -35,9 +35,9 @@ Before IRSA
 ------------
 Before IRSA, many companies used AWS Access Keys.
 
-AWS_ACCESS_KEY_ID
-
-AWS_SECRET_ACCESS_KEY
+      AWS_ACCESS_KEY_ID
+      
+      AWS_SECRET_ACCESS_KEY
 
 stored as
 
@@ -45,12 +45,12 @@ Kubernetes Secret
 
 Example
 
-apiVersion: v1
-kind: Secret
-
-data:
-  AWS_ACCESS_KEY_ID: xxxx
-  AWS_SECRET_ACCESS_KEY: xxxx
+      apiVersion: v1
+      kind: Secret
+      
+      data:
+        AWS_ACCESS_KEY_ID: xxxx
+        AWS_SECRET_ACCESS_KEY: xxxx
 
 Application
 
@@ -70,13 +70,13 @@ Problems
 --------
 Problem 1
 
-Long-lived credentials
+    Long-lived credentials
 
-Access Key
-
-↓
-
-Never changes
+    Access Key
+    
+    ↓
+    
+    Never changes
 
 If leaked,
 
@@ -132,6 +132,7 @@ Instead of storing AWS credentials,
 AWS says:
 
 "Use your Kubernetes ServiceAccount identity."
+
 So now
 
 Pod
@@ -163,45 +164,45 @@ Attach an AWS IAM Role to a Kubernetes ServiceAccount.
 
 Instead of
 
-Pod
-
-↓
-
-AWS Keys
+    Pod
+    
+    ↓
+    
+    AWS Keys
 
 We use
 
-Pod
-
-↓
-
-ServiceAccount
-
-↓
-
-IAM Role
+    Pod
+    
+    ↓
+    
+    ServiceAccount
+    
+    ↓
+    
+    IAM Role
 
 Real Flow
 ----------
 Suppose
 
-Pod
-
-↓
-
-ServiceAccount
-
-↓
-
-app-sa
+    Pod
+    
+    ↓
+    
+    ServiceAccount
+    
+    ↓
+    
+    app-sa
 
 And
 
-IAM Role
-
-↓
-
-S3ReadOnlyRole
+    IAM Role
+    
+    ↓
+    
+    S3ReadOnlyRole
 
 is attached to
 
@@ -233,11 +234,11 @@ comes into the picture.
 
 What is OIDC?
 --------------
-OIDC
-
-=
-
-OpenID Connect
+    OIDC
+    
+    =
+    
+    OpenID Connect
 
 It is an identity protocol.
 
@@ -245,15 +246,15 @@ Your EKS cluster publishes an OIDC endpoint.
 
 Example
 
-https://oidc.eks.ap-south-1.amazonaws.com/id/ABC123XY
+    https://oidc.eks.ap-south-1.amazonaws.com/id/ABC123XY
 
 Think of it as:
-
-EKS
-
-↓
-
-Identity Provider
+    
+    EKS
+    
+    ↓
+    
+    Identity Provider
 
 AWS IAM is configured to trust this identity provider.
 
@@ -262,11 +263,11 @@ Trust Relationship
 ------------------
 Imagine
 
-Kubernetes
-
-↓
-
-"I created this JWT."
+    Kubernetes
+    
+    ↓
+    
+    "I created this JWT."
 
 AWS asks
 
@@ -286,128 +287,132 @@ Let's understand every step.
 
 Step 1
 
-Pod starts.
-
-Pod
-
-↓
-
-Uses ServiceAccount app-sa
+    Pod starts.
+    
+    Pod
+    
+    ↓
+    
+    Uses ServiceAccount app-sa
 Step 2
 
 Kubelet requests a Bound Service Account Token.
 
-Kubelet
-
-↓
-
-TokenRequest API
-
-↓
-
-API Server
-
-↓
-
-JWT Token
+    Kubelet
+    
+    ↓
+    
+    TokenRequest API
+    
+    ↓
+    
+    API Server
+    
+    ↓
+    
+    JWT Token
 Step 3
 
-JWT mounted inside Pod.
-
-/var/run/secrets/kubernetes.io/serviceaccount/token
+      JWT mounted inside Pod.
+      
+      /var/run/secrets/kubernetes.io/serviceaccount/token
 Step 4
 
-Application wants S3.
+    Application wants S3.
 
 Instead of
 
-AWS Access Key
+    AWS Access Key
 
 it sends
 
-JWT Token
+    JWT Token
 
 to
 
-AWS STS
+    AWS STS
 
 What is AWS STS?
 ----------------
-STS
-
-=
-
-Security Token Service.
+    STS
+    
+    =
+    
+    Security Token Service.
 
 Its job is
 
-Validate Identity
-
-↓
-
-Issue Temporary AWS Credentials
+    Validate Identity
+    
+    ↓
+    
+    Issue Temporary AWS Credentials
 
 Step 5
 
-STS verifies
-
-JWT
-
-using
-
-OIDC Provider
-
-If valid
-
-↓
-
-STS generates
-
-Temporary Access Key
-
-Temporary Secret Key
-
-Session Token
+    STS verifies
+    
+    JWT
+    
+    using
+    
+    OIDC Provider
+    
+    If valid
+    
+    ↓
+    
+    STS generates
+    
+    Temporary Access Key
+    
+    Temporary Secret Key
+    
+    Session Token
 
 Step 6
 
-Application receives
-
-Temporary Credentials
-
-and calls
-
-Amazon S3
+    Application receives
+    
+    Temporary Credentials
+    
+    and calls
+    
+    Amazon S3
+    
 Entire Flow
-Application
 
-        │
-        ▼
-Bound JWT Token
 
-        │
-        ▼
-AWS STS
-
-        │
-        ▼
-Validate JWT
-
-        │
-        ▼
-OIDC Provider
-
-        │
-        ▼
-Yes, Valid
-
-        │
-        ▼
-Temporary AWS Credentials
-
-        │
-        ▼
-S3
+      Application
+      
+              │
+              ▼
+      Bound JWT Token
+      
+              │
+              ▼
+      AWS STS
+      
+              │
+              ▼
+      Validate JWT
+      
+              │
+              ▼
+      OIDC Provider
+      
+              │
+              ▼
+      Yes, Valid
+      
+              │
+              ▼
+      Temporary AWS Credentials
+      
+              │
+              ▼
+      S3
+      
 Why is this Secure?
 
 Because
@@ -487,28 +492,32 @@ IAM Role
 
 Route53Access
 --------------
+
 IRSA Setup (High-Level)
+
 Step 1
 
 Create OIDC Provider
 
-eksctl utils associate-iam-oidc-provider \
---cluster demo \
---approve
+    eksctl utils associate-iam-oidc-provider \
+    --cluster demo \
+    --approve
+
 Step 2
 
 Create IAM Policy
 
 Example
 
-s3:GetObject
+    s3:GetObject
+    
+    s3:PutObject
 
-s3:PutObject
 Step 3
 
-Create IAM Role
-
-Attach Policy.
+    Create IAM Role
+    
+    Attach Policy.
 
 Step 4
 
@@ -518,7 +527,7 @@ Very important.
 
 Trust only
 
-system:serviceaccount:default:app-sa
+    system:serviceaccount:default:app-sa
 
 This ensures only that specific ServiceAccount can assume the IAM Role.
 
@@ -526,16 +535,16 @@ Step 5
 
 Annotate ServiceAccount
 
-apiVersion: v1
-kind: ServiceAccount
+    apiVersion: v1
+    kind: ServiceAccount
+    
+    metadata:
+    
+      name: app-sa
+    
+      annotations:
 
-metadata:
-
-  name: app-sa
-
-  annotations:
-
-    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/S3ReadOnlyRole
+      eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/S3ReadOnlyRole
 
 This annotation tells EKS:
 
@@ -544,10 +553,10 @@ This annotation tells EKS:
 Step 6
 
 Create Pod
-
-spec:
-
-  serviceAccountName: app-sa
+    
+    spec:
+    
+      serviceAccountName: app-sa
 
 Done.
 
@@ -584,6 +593,8 @@ IAM Role
         │
         ▼
 ECR + S3
+
+
 ExternalDNS
         │
         ▼
@@ -594,6 +605,8 @@ IAM Role
         │
         ▼
 Route53
+
+
 AWS Load Balancer Controller
         │
         ▼
