@@ -148,40 +148,7 @@ YES
 
 ALLOW
 
-Internal Decision Tree
-Request
 
-↓
-
-Identity
-
-↓
-
-RoleBinding?
-
-↓
-
-Role?
-
-↓
-
-Correct Namespace?
-
-↓
-
-Correct API Group?
-
-↓
-
-Correct Resource?
-
-↓
-
-Correct Verb?
-
-↓
-
-ALLOW
 
 If any check fails, Kubernetes returns:
 
@@ -194,20 +161,26 @@ Many RBAC problems happen because people forget the API group.
 Examples:
 
 Pods
-apiGroups:
-- ""
 
-Core API group.
+          apiGroups:
+          - ""
+          Core API group.
 
-Deployments
-apiGroups:
-- apps
+Deployments:
+
+          apiGroups:
+          - apps
+
+- 
 Jobs
-apiGroups:
-- batch
+
+              apiGroups:
+              - batch
+  
 Ingress
-apiGroups:
-- networking.k8s.io
+
+              apiGroups:
+              - networking.k8s.io
 
 If you specify the wrong API group, RBAC will not match the request.
 
@@ -296,13 +269,13 @@ Suppose:
 
 Role A
 
-Resources:
-Pods
+      Resources:
+      Pods
 
 Role B
 
-Resources:
-ConfigMaps
+      Resources:
+      ConfigMaps
 
 Both are bound to the same ServiceAccount.
 
