@@ -60,6 +60,35 @@ DNS: is the Domine Name System.
     Type: CNAME
     in the C name records will add a subdomine Magic.aravind.dev
     then this subdomine point out to our root domine aravind.dev A Record.
+    Another Eg:
+
+    1. I have a domine aravind.com
+    2. this domine is managed By Pavani.com
+    3. so if i hard coded the Pavni.com  A record IP address like in my domine aravind.com By using A record.
+    4. due to some reasons the pavani.com was changed there A record IP addess.
+    5. it will causes who are the uses are accessing aravind.com will face down time because still i hava a old record of the Pavani.com.
+    6. so to avoid these thing i will use CNAME for this
+    7. now in my aravind.com i will use CNAME record to point it out to pavani.com
+    8. so in future if they change the IP A record of the pavani with the help of CNAME I WILL access the it.
+   
+  3. NS records:
+     -----------
+     1. if i use this it will tell for my domine and my sub domines will be managed by ns record.
+
+     Eg:
+     1, i have a domine aravind.com and for thet i have a neameing server NS record like ns.someting.com
+     2. i have some  subdomines eg: pav.aravind.com , z.aravind.com, user.aravind.com for my aravind.com
+    
+     3. in my aravind.com i have a record like:
+     4. NS       aravind.com             ns.something.com
+
+     5. if some one try to access the my subdomine pav.aravind.com first it will see the root domine in my sub domine aravind.com
+     6. then it will find the NS record in my domine and it will point it out to ns.something.com
+     7. Now this ns.something have a A record with an IP called 1.2.3.4 but hear we can't resolve the domine name with this IP of ns.something.com
+     8. this ns.something.com have a server which is running on Port 53 with UPD exposed with the help of this server will resolve our domine name and get the IP          address of my sub-dome.
+     9. it's just like creating our own DNS server.
+
+    
     
       
       
