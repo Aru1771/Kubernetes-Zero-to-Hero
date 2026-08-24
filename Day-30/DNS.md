@@ -89,6 +89,12 @@ DNS: is the Domine Name System.
      9. it's just like creating our own DNS server.
 
     
-    
+
+* if you want to add some DNS records loacally we have to add them in /ect/hosts file.
+* these will like a A records in localy
+* second file /etc/resolve.conf
+* this file will acts like DNS settings who will resolve intenally my domine name.
+* you will see your router IP hear.
+* you'r router will do domine resolving.
       
       
