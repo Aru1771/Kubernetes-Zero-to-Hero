@@ -10,29 +10,29 @@ A network is a way for devices to communicate with each other.
 
 For example:
 
-Laptop
-   |
-   |
-Router
-   |
-   +------ Server 1
-   |
-   +------ Server 2
+         Laptop
+            |
+            |
+         Router
+            |
+            +------ Server 1
+            |
+            +------ Server 2
 
 The laptop can communicate with Server 1 and Server 2 through the network.
 
 In a Kubernetes environment:
 
-Node 1
-   |
-   +---- Pod A
-   +---- Pod B
-
-
-Node 2
-   |
-   +---- Pod C
-   +---- Pod D
+      Node 1
+         |
+         +---- Pod A
+         +---- Pod B
+      
+      
+      Node 2
+         |
+         +---- Pod C
+         +---- Pod D
 
 The Pods also need a network so they can communicate.
 
@@ -42,16 +42,16 @@ An IP address identifies a device/interface on a network.
 
 Example:
 
-Server A → 192.168.1.10
-Server B → 192.168.1.20
+      Server A → 192.168.1.10
+      Server B → 192.168.1.20
 
 If Server A wants to communicate with Server B:
 
-192.168.1.10
-      |
-      | network
-      ↓
-192.168.1.20
+      192.168.1.10
+            |
+            | network
+            ↓
+      192.168.1.20
 
 Think of an IP address like a house address.
 
@@ -59,34 +59,38 @@ If I want to send something to your house, I need to know your address.
 
 Similarly:
 
-Network packet
-      ↓
-Destination IP
-      ↓
-192.168.1.20
+         Network packet
+               ↓
+         Destination IP
+               ↓
+         192.168.1.20
+
+
 3. IPv4
 
 Most Kubernetes networking discussions use IPv4.
 
 Example:
 
-192.168.1.10
+      192.168.1.10
 
 IPv4 contains 4 numbers separated by dots.
 
-192 . 168 . 1 . 10
+      192 . 168 . 1 . 10
 
 Each section can range from:
 
-0 - 255
+      0 - 255
 
 So this is valid:
 
-192.168.1.10
+      192.168.1.10
 
 This is not valid:
 
-192.168.1.300
+         192.168.1.300
+
+         
 4. Public IP vs Private IP
 
 This is very important in AWS and Kubernetes.
@@ -97,17 +101,17 @@ Used inside private networks.
 
 Examples:
 
-10.0.0.10
-172.16.10.20
-192.168.1.50
+         10.0.0.10
+         172.16.10.20
+         192.168.1.50
 Public IP
 
 Used to communicate over the public Internet.
 
 Example:
 
-13.x.x.x
-3.x.x.x
+      13.x.x.x
+      3.x.x.x
 
 Imagine an AWS VPC:
 
@@ -123,42 +127,44 @@ Private IP
 
 The EC2 instance can have:
 
-Public IP  → Internet communication
-Private IP → VPC communication
+      Public IP  → Internet communication
+      Private IP → VPC communication
+
+
 5. What is a subnet?
 
 Suppose we have:
 
-10.0.0.0/24
+      10.0.0.0/24
 
 This represents a network containing IP addresses from approximately:
 
-10.0.0.0
-      ↓
-10.0.0.255
+      10.0.0.0
+            ↓
+      10.0.0.255
 
 We can divide a large network into smaller networks.
 
 For example:
 
-10.0.0.0/16
+      10.0.0.0/16
 
 can be divided into:
 
-10.0.1.0/24
-10.0.2.0/24
-10.0.3.0/24
+      10.0.1.0/24
+      10.0.2.0/24
+      10.0.3.0/24
 
 In AWS:
 
-VPC
-10.0.0.0/16
-      |
-      +---- Public Subnet
-      |     10.0.1.0/24
-      |
-      +---- Private Subnet
-            10.0.2.0/24
+      VPC
+      10.0.0.0/16
+            |
+            +---- Public Subnet
+            |     10.0.1.0/24
+            |
+            +---- Private Subnet
+                  10.0.2.0/24
 
 This becomes very important when we study Kubernetes nodes and Pod CIDRs.
 
@@ -175,14 +181,14 @@ Server
 
 Maybe this server is running:
 
-SSH       → 22
-HTTP      → 80
-HTTPS     → 443
-MySQL     → 3306
+      SSH       → 22
+      HTTP      → 80
+      HTTPS     → 443
+      MySQL     → 3306
 
 So:
 
-10.0.1.10:22
+      10.0.1.10:22
 
 means:
 
@@ -202,17 +208,17 @@ This is a very important combination.
 
 Think:
 
-IP   = Which machine?
-Port = Which application?
+      IP   = Which machine?
+      Port = Which application?
 
 For example:
 
-10.0.1.10:8080
+      10.0.1.10:8080
 
 means:
 
-Machine → 10.0.1.10
-Application → port 8080
+      Machine → 10.0.1.10
+      Application → port 8080
 
 Later in Kubernetes:
 
@@ -228,8 +234,8 @@ will make much more sense.
 
 Two important transport protocols are:
 
-TCP
-UDP
+      TCP
+      UDP
 TCP
 
 TCP provides reliable communication.
@@ -246,10 +252,10 @@ TCP makes sure data is delivered reliably and in order.
 
 Common examples:
 
-HTTP
-HTTPS
-SSH
-MySQL
+      HTTP
+      HTTPS
+      SSH
+      MySQL
 UDP
 
 UDP is simpler and faster but does not provide TCP-style delivery guarantees.
