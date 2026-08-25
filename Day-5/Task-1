@@ -30,6 +30,11 @@ spec:
   containers:
   - image: rediss
     name: redis
+
+To enter into a Pod:
+-------------------
+kubectl exec -it pod_name -c cont_name -- bash -il
+
     
 Share your learnings: Document your key takeaways and insights in a blog post and social media update
 Make it public: Share what you learn publicly on LinkedIn or Twitter.
