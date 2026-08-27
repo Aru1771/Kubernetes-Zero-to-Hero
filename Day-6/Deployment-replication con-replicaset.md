@@ -49,23 +49,23 @@ Replication controller, Replicaset, Deployment
 
    Replication controller rc.yaml file:
    ----------------------------------
-   apiversion: v1
-   kind: Replication Controller
-   metadata:
-     name: first-rc
-     labels:
-       app: emp
-   spec:
-     tempalte:
-       metadata:
-         name: emp-pod
-         lables:
-           app: emp
-       spec:
-         containers:
-           - name: emp-cont
-             image: nginx
-     replicas: 3
+        apiversion: v1
+        kind: Replication Controller
+        metadata:
+          name: first-rc
+          labels:
+            app: emp
+        spec:
+          tempalte:
+            metadata:
+              name: emp-pod
+              lables:
+                app: emp
+            spec:
+              containers:
+                - name: emp-cont
+                  image: nginx
+          replicas: 3
 
 cmd: kubectl create -f rc.yaml
 
@@ -81,26 +81,26 @@ replication controller is a legacy version
 
  Replicaset rs.yaml file:
  ----------------------------------
-   apiversion: apps/v1
-   kind: Replicaset
-   metadata:
-     name: first-rs
-     labels:
-       app: emp
-   spec:
-     tempalte:
-       metadata:
-         name: emp-pod
-         lables:
-           app: emp
-       spec:
-         containers:
-           - name: emp-cont
-             image: nginx
-     replicas: 3
-     selector:
-       matchLables:
+     apiversion: apps/v1
+     kind: Replicaset
+     metadata:
+       name: first-rs
+       labels:
          app: emp
+     spec:
+       tempalte:
+         metadata:
+           name: emp-pod
+           lables:
+             app: emp
+         spec:
+           containers:
+             - name: emp-cont
+               image: nginx
+       replicas: 3
+       selector:
+         matchLables:
+           app: emp
 
 cmd: kubectl create -f rs.yaml
 
@@ -130,26 +130,26 @@ Note: it you want k8s help: kubectl scale --help  ---> it will show all the cmds
 
 Deployment dp.yaml file:
 ----------------------------------
-   apiversion: apps/v1
-   kind: Deployment
-   metadata:
-     name: first-dp
-     labels:
-       app: emp
-   spec:
-     tempalte:
-       metadata:
-         name: emp-pod
-         lables:
-           app: emp
-       spec:
-         containers:
-           - name: emp-cont
-             image: nginx
-     replicas: 3
-     selector:
-       matchLables:
+     apiversion: apps/v1
+     kind: Deployment
+     metadata:
+       name: first-dp
+       labels:
          app: emp
+     spec:
+       tempalte:
+         metadata:
+           name: emp-pod
+           lables:
+             app: emp
+         spec:
+           containers:
+             - name: emp-cont
+               image: nginx
+       replicas: 3
+       selector:
+         matchLables:
+           app: emp
 
 cmd: kubectl create -f dp.yaml
 
