@@ -14,11 +14,56 @@ Scale the Deployment to 2 replicas.
 
 Create a temporary Pod using the image busybox and run a wget command against the IP of the service.
 
+     apiVersion: v1
+     kind: Pod
+     metadata:
+       name: busy-box-pod
+       labels:
+         app: busy-box
+     spec:
+       containers:
+         - name: busy-box-cont
+           image: busybox
+           command: ["sleep"]
+           args: ["900"]
+           ports:
+             - containerPort: 80
+
+Enter in to the container:
+
+      kubectl exec -it pod_name -- /bin/sh
+
+Ping the ClusterIp service inside the Pod:
+
+     wget -o- http://cluster_ip:service_port
+
+you we will get the responce.
+
+
 Run a wget command against the service outside the cluster.
+
+
+            wget -o- http://cluster_ip:service_port
+
+you will not get the responce.
 
 Change the service type so the Pods can be reached outside the cluster.
 
+
+    ClusterIP ---> NodePort
+
 Run a wget command against the service outside the cluster.
+
+Firts:
+get the kind node ip where our pods are running by using:
+
+
+     kubectl get nodes -o wide
+
+pick the node Ip and run the cmd out side the cluster:
+
+    wget -o- http://node_ip:node_port
+
 
 Discuss: Can you expose the Pods as a service without a deployment?
 
