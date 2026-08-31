@@ -221,5 +221,7 @@ output:
 
 11. Now use the FQDN of the service and try to curl again, this should work.
 
-    
+    * in this step when i try to clur the FQSN i will unable to reach the service.
+   
+    * Refer the issue in k8s-troublesoot_repo
 In the end, delete both the namespaces, which should delete the services and deployments underneath them.
