@@ -1,11 +1,12 @@
 Kubernetes Networking — Day 1: Networking Fundamentals
+========================================================
 
 Today we will not start with Kubernetes yet.
 
 First, we need to understand the networking concepts that Kubernetes is built on. If these are clear, CNI, Services, kube-proxy, CoreDNS, and NetworkPolicy will become much easier.
 
-1. What is a network?
-
+What is a network?
+----------------------
 A network is a way for devices to communicate with each other.
 
 For example:
@@ -36,9 +37,18 @@ In a Kubernetes environment:
 
 The Pods also need a network so they can communicate.
 
-2. What is an IP address?
-
+What is an IP address?
+-----------------------
 An IP address identifies a device/interface on a network.
+
+An IP address is a logical address assigned to a network interface, used to identify and communicate with a device/interface on an IP network.
+
+                  Server
+                    │
+                    └── Network Interface (eth0)
+                            │
+                            └── IP: 192.168.1.10
+
 
 Example:
 
@@ -66,8 +76,8 @@ Similarly:
          192.168.1.20
 
 
-3. IPv4
-
+IPv4
+--------
 Most Kubernetes networking discussions use IPv4.
 
 Example:
@@ -91,8 +101,8 @@ This is not valid:
          192.168.1.300
 
          
-4. Public IP vs Private IP
-
+Public IP vs Private IP
+-------------------------
 This is very important in AWS and Kubernetes.
 
 Private IP
@@ -131,8 +141,8 @@ The EC2 instance can have:
       Private IP → VPC communication
 
 
-5. What is a subnet?
-
+What is a subnet?
+-------------------
 Suppose we have:
 
       10.0.0.0/24
@@ -168,8 +178,8 @@ In AWS:
 
 This becomes very important when we study Kubernetes nodes and Pod CIDRs.
 
-6. What is a port?
-
+What is a port?
+----------------
 An IP address identifies the machine/interface.
 
 A port identifies the application/service on that machine.
@@ -202,8 +212,8 @@ means:
 
 Connect to the HTTP application on that machine.
 
-7. IP + Port
-
+IP + Port
+-------------
 This is a very important combination.
 
 Think:
@@ -230,8 +240,8 @@ Pod IP : Container Port
 
 will make much more sense.
 
-8. TCP vs UDP
-
+TCP vs UDP
+------------
 Two important transport protocols are:
 
       TCP
@@ -259,6 +269,9 @@ Common examples:
 UDP
 
 UDP is simpler and faster but does not provide TCP-style delivery guarantees.
+UDP itself doesn't say: "Packet 2 was lost, let me retransmit it."
+
+The application/protocol running on top of UDP can implement its own reliability if needed.
 
 Common examples include:
 
@@ -270,11 +283,42 @@ For Kubernetes, remember:
 
 DNS commonly uses UDP port 53.
 
-9. What is a MAC address?
+TCP vs UDP
+-----------
+| TCP                   | UDP                          |
+| --------------------- | ---------------------------- |
+| Connection-oriented   | Connectionless               |
+| Reliable              | No delivery guarantee        |
+| Ordered delivery      | No ordering guarantee        |
+| Retransmits lost data | Doesn't retransmit by itself |
+| 3-way handshake       | No TCP-style handshake       |
+| More overhead         | Lower overhead               |
+| Generally slower      | Generally faster             |
+| File transfer         | Real-time traffic            |
 
+What is a MAC address?
+-------------------------
 An IP address is a logical network address.
 
 A MAC address identifies a network interface at the data-link layer.
+
+A MAC address is a Layer-2 hardware/link-layer address associated with a network interface.
+
+
+                  Server
+                    │
+                    └── eth0
+                         │
+                         ├── MAC: 00:1A:2B:3C:4D:5E
+                         │
+                         └── IP: 192.168.1.10
+
+
+
+MAC address → identity/address of the network interface at Layer 2
+IP address  → logical network address used for communication/routing
+
+
 
 Example:
 
@@ -296,46 +340,46 @@ Network interface address
 
 Later, when we study ARP, bridges, veth pairs, and containers, MAC addresses become important.
 
-10. What is a network interface?
-
+What is a network interface?
+-----------------------------
 A server needs something to connect to a network.
 
 That is a network interface.
 
 On Linux, you might see:
 
-ip addr
+                  ip addr
 
 You may see:
 
-eth0
-ens5
-lo
+                  eth0
+                  ens5
+                  lo
 
 For example:
 
-ens5
-  |
-  +---- 10.0.1.10
+                  ens5
+                    |
+                    +---- 10.0.1.10
 
 The interface is basically the connection between the machine and the network.
 
-11. What is localhost?
-
+What is localhost?
+----------------------
 localhost means:
 
 This same machine.
 
 Usually:
 
-127.0.0.1
+                  127.0.0.1
 
 Example:
 
-Application
-    |
-    ↓
-127.0.0.1:8080
+                  Application
+                      |
+                      ↓
+                  127.0.0.1:8080
 
 This means the application is listening only on the local machine.
 
@@ -347,17 +391,17 @@ This is one of the most important concepts for Kubernetes networking.
 
 Imagine:
 
-Server A
-10.0.1.10
-    |
-    |
-    ↓
-Router
-    |
-    |
-    ↓
-Server B
-10.0.2.10
+                  Server A
+                  10.0.1.10
+                      |
+                      |
+                      ↓
+                  Router
+                      |
+                      |
+                      ↓
+                  Server B
+                  10.0.2.10
 
 Server A needs to know:
 
@@ -376,9 +420,9 @@ default via 10.0.1.1 dev eth0
 
 Meaning roughly:
 
-10.0.1.0/24
-    ↓
-Directly reachable through eth0
+                  10.0.1.0/24
+                      ↓
+                  Directly reachable through eth0
 
 and:
 
@@ -386,8 +430,9 @@ default via 10.0.1.1
     ↓
 For destinations I don't know,
 send traffic to 10.0.1.1
-13. What is a default gateway?
 
+What is a default gateway?
+--------------------------
 Suppose your server has:
 
 IP:
@@ -422,8 +467,8 @@ Think of the gateway as:
 
 The door through which traffic leaves your network.
 
-14. What is DNS?
-
+What is DNS?
+-------------
 DNS converts names into IP addresses.
 
 Instead of remembering:
@@ -456,8 +501,8 @@ can resolve to a Kubernetes Service IP.
 
 We'll study CoreDNS later.
 
-15. What is NAT?
-
+What is NAT?
+------------
 NAT means:
 
 Network Address Translation
@@ -486,8 +531,8 @@ NAT Gateway
 
 Later, Kubernetes networking will also involve NAT in some traffic paths.
 
-16. Now connect these concepts to Kubernetes
-
+Now connect these concepts to Kubernetes
+------------------------------------------
 Suppose we have:
 
 Kubernetes Node 1
