@@ -13,8 +13,8 @@ communicate with each other.
 Before Kubernetes networking, we need to understand the Linux pieces underneath it.
 
 
-1. First understand the big picture
-
+First understand the big picture
+-------------------------------------
 Imagine we create two Linux network namespaces:
 
       Namespace A                    Namespace B
@@ -30,21 +30,21 @@ Imagine we create two Linux network namespaces:
 
   The major components are:
 
-  Network Namespace
-       ↓
-veth pair
-       ↓
-Linux Bridge
-       ↓
-Routing Table
-       ↓
-iptables / NAT
+      Network Namespace
+             ↓
+      veth pair
+             ↓
+      Linux Bridge
+             ↓
+      Routing Table
+             ↓
+      iptables / NAT
 
 Each one has a specific job.
 
 
-2. What is a Network Namespace?
-   ----------------------------
+What is a Network Namespace?
+----------------------------
 
 A network namespace gives a process its own isolated networking environment.
 
@@ -69,7 +69,7 @@ For example:
        |                         |
        +-------------------------+
 
-  Without namespaces, all processes would normally use the host's networking.
+Without namespaces, all processes would normally use the host's networking.
 
   With network namespaces:
 
@@ -86,8 +86,8 @@ For example:
 
 This is one of the fundamental technologies behind Linux containers.
 
-3. Let's create two namespaces
-   ---------------------------
+Let's create two namespaces
+---------------------------
 Run:
 
     sudo ip netns add ns1
@@ -116,14 +116,14 @@ You'll notice they don't have the normal host interfaces.
 That's because each namespace has its own networking environment.
 
 
-4. But how do we connect the namespace to the host?
-   ------------------------------------------------
+But how do we connect the namespace to the host?
+------------------------------------------------
 
 This is where the veth pair comes in.
 
 What is a veth pair?
-
-veth = Virtual Ethernet
+    
+    veth = Virtual Ethernet
 
 Think of it like a virtual network cable.
 
@@ -138,23 +138,23 @@ Anything entering one end comes out of the other end.
       veth1 <-----------------> veth2
 
 
-5. Create a veth pair
-   ------------------
+Create a veth pair
+------------------
 
 
          sudo ip link add veth-ns1 type veth peer name veth-host1
    
 Linux creates two endpoints of one virtual Ethernet cable:
 
-        VETH PAIR
-   =====================
+                VETH PAIR
+           =====================
 
-veth-ns1              veth-host1
-   │                       │
-   │                       │
-   ↓                       ↓
-ns1 Network              Host
-Namespace                Network
+      veth-ns1              veth-host1
+         │                       │
+         │                       │
+         ↓                       ↓
+      ns1 Network              Host
+      Namespace                Network
 
 Now:
 
@@ -185,17 +185,17 @@ This is extremely similar to what container networking does.
 
 so in step 5 when we are creating Veth it will creating two end points one is veth-ns for network namesapce to connect and another end veth-host for connect to host
 
-veth-ns1 → endpoint that we put inside the network namespace
-veth-host1 → endpoint that stays on the host
-Together they form one veth pair
-Data sent into one endpoint comes out the other endpoint.
+      veth-ns1 → endpoint that we put inside the network namespace
+      veth-host1 → endpoint that stays on the host
+      Together they form one veth pair
+      Data sent into one endpoint comes out the other endpoint.
 
 And later, we'll connect veth-host1 to the Linux bridge (br0).
 
 
 
-6. Why do we need a bridge?
-   -------------------------
+Why do we need a bridge?
+-------------------------
 
 Suppose we have:
 
@@ -243,8 +243,8 @@ This is conceptually similar to:
       PC1       PC2
 
 
-7. Create a Linux bridge
-   ---------------------
+Create a Linux bridge
+---------------------
 
    
         sudo ip link add br0 type bridge
@@ -295,8 +295,8 @@ Now:
 This is a very important topology to remember.
 
 
-9. Give IP addresses to the namespaces
-
+Give IP addresses to the namespaces
+------------------------------------
 Inside ns1:
 
     sudo ip netns exec ns1 ip addr add 10.0.0.2/24 dev veth-ns1
@@ -322,8 +322,8 @@ Now:
        +---------- br0 ------------+
 
 
-10. Test communication
-
+Test communication
+-----------------
 From ns1:
 
     sudo ip netns exec ns1 ping 10.0.0.3
@@ -360,8 +360,8 @@ So:
 The Linux bridge acts like a virtual switch and forwards the Ethernet frame to the correct veth interface.
 
 
-11. Where does the Routing Table come in?
-    ------------------------------------
+Where does the Routing Table come in?
+------------------------------------
 
 Now suppose ns1 wants to communicate with:
 
@@ -436,8 +436,9 @@ Flow:
 This is where routing + NAT become important.
 
 
-13. What is NAT?
-    -------------
+What is NAT?
+-------------
+
 NAT = Network Address Translation
 
 Containers commonly use private IP addresses:
@@ -524,8 +525,8 @@ or:
 iptables-save
 
 
-15. Now connect this to Docker
-    ---------------------------
+Now connect this to Docker
+---------------------------
 When you run:
 
 docker run nginx
