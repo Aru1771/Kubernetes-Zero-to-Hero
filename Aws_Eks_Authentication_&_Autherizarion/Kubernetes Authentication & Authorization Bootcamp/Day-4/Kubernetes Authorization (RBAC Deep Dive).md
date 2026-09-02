@@ -68,43 +68,43 @@ kubectl get pods -n dev
 
 RBAC evaluates:
 Internal Decision Tree
-Request
-
-↓
-
-Identity
-
-↓
-
-RoleBinding?
-
-↓
-
-Role?
-
-↓
-
-Correct Namespace?
-
-↓
-
-Correct API Group?
-
-↓
-
-Correct Resource?
-
-↓
-
-Correct Verb?
-
-↓
-
-ALLOW
+      Request
+      
+      ↓
+      
+      Identity
+      
+      ↓
+      
+      RoleBinding?
+      
+      ↓
+      
+      Role?
+      
+      ↓
+      
+      Correct Namespace?
+      
+      ↓
+      
+      Correct API Group?
+      
+      ↓
+      
+      Correct Resource?
+      
+      ↓
+      
+      Correct Verb?
+      
+      ↓
+      
+      ALLOW
 
 If any check fails, Kubernetes returns:
 
-Forbidden
+      Forbidden
 
 Question 1
 
