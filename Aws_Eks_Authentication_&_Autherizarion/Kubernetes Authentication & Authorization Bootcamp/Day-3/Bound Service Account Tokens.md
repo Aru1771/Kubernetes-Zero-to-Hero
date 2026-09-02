@@ -127,9 +127,9 @@ You are saying:
 
 So the relationship is:
 
-Pod
- ↓
-myapp-sa
+                  Pod
+                   ↓
+                  myapp-sa
 
 2. Kubelet gets involved
 
@@ -162,19 +162,19 @@ It uses the TokenRequest API.
 
 Conceptually:
 
-Kubelet
-   |
-   | "Give me a token for myapp-sa
-   |  for this Pod"
-   ↓
-API Server
+            Kubelet
+               |
+               | "Give me a token for myapp-sa
+               |  for this Pod"
+               ↓
+            API Server
 
 The request contains information such as:
 
-ServiceAccount = myapp-sa
-Namespace = dev
-Pod identity
-Requested expiration
+            ServiceAccount = myapp-sa
+            Namespace = dev
+            Pod identity
+            Requested expiration
 
 4. API Server creates the JWT
 
@@ -184,13 +184,13 @@ If everything is valid, Kubernetes creates a short-lived JWT.
 
 For example:
 
-JWT
-│
-├── ServiceAccount identity
-├── Namespace
-├── Pod information
-├── Issuer
-└── Expiration time
+            JWT
+            │
+            ├── ServiceAccount identity
+            ├── Namespace
+            ├── Pod information
+            ├── Issuer
+            └── Expiration time
 
 Think of this token as:
 
@@ -198,8 +198,8 @@ A temporary identity card for the Pod.
 
 For example:
 
-Token valid:
-10:00 AM → 11:00 AM
+            Token valid:
+            10:00 AM → 11:00 AM
 
 The exact lifetime depends on the cluster's configuration and limits.
 
@@ -209,11 +209,11 @@ The API server doesn't directly put the token inside the container.
 
 Instead:
 
-API Server
-    ↓
-JWT
-    ↓
-Kubelet
+            API Server
+                ↓
+            JWT
+                ↓
+            Kubelet
 
 The kubelet receives the token.
 
@@ -326,35 +326,35 @@ Complete flow
 
 Put everything together:
 
-                Kubernetes API Server
-                         ↑
-                         |
-                   TokenRequest
-                         |
-                         |
-Pod Created → Kubelet ───┘
-                |
-                | receives JWT
-                ↓
-        Short-lived JWT
-                |
-                ↓
-      Mounted into Pod
-                |
-                ↓
-/var/run/secrets/kubernetes.io/serviceaccount/token
-                |
-                ↓
-       Application uses JWT
-                |
-                ↓
-        API Server validates
-                |
-                ↓
-             RBAC
-                |
-                ↓
-        Allow / Deny
+                                  Kubernetes API Server
+                                           ↑
+                                           |
+                                     TokenRequest
+                                           |
+                                           |
+                  Pod Created → Kubelet ───┘
+                                  |
+                                  | receives JWT
+                                  ↓
+                          Short-lived JWT
+                                  |
+                                  ↓
+                        Mounted into Pod
+                                  |
+                                  ↓
+                  /var/run/secrets/kubernetes.io/serviceaccount/token
+                                  |
+                                  ↓
+                         Application uses JWT
+                                  |
+                                  ↓
+                          API Server validates
+                                  |
+                                  ↓
+                               RBAC
+                                  |
+                                  ↓
+                          Allow / Deny
 
 
 
@@ -515,7 +515,7 @@ Where is the token stored?
 --------------------------
 Inside every Pod:
 
-/var/run/secrets/kubernetes.io/serviceaccount/
+            /var/run/secrets/kubernetes.io/serviceaccount/
 
 Let's verify.
 
@@ -538,17 +538,17 @@ kubectl exec -it nginx -- sh
 
 Check:
 
-cd /var/run/secrets/kubernetes.io/serviceaccount
+            cd /var/run/secrets/kubernetes.io/serviceaccount
 
 List files:
 
-ls
+            ls
 
 Output
 
-ca.crt
-namespace
-token
+                  ca.crt
+                  namespace
+                  token
 
 Read token
 
