@@ -185,32 +185,32 @@ kubectl get pods
 
 The flow is:
 
-kubectl
-      │
-Reads kubeconfig
-      │
-Gets client certificate
-      │
-Connects to API Server
-      │
-API Server checks:
-"Is this certificate signed by my CA?"
-      │
-YES
-      │
-Authentication Successful
-      │
-RBAC Authorization
-      │
-Returns Pods
+            kubectl
+                  │
+            Reads kubeconfig
+                  │
+            Gets client certificate
+                  │
+            Connects to API Server
+                  │
+            API Server checks:
+            "Is this certificate signed by my CA?"
+                  │
+            YES
+                  │
+            Authentication Successful
+                  │
+            RBAC Authorization
+                  │
+            Returns Pods
 
 Notice the order:
-
-Authentication
-
-↓
-
-Authorization
+            
+            Authentication
+            
+            ↓
+            
+            Authorization
 
 Kubernetes never checks RBAC until authentication succeeds.
 
@@ -222,17 +222,17 @@ If you created the cluster using kubeadm, you'll typically find them on the cont
 
 Example:
 
-ca.crt
-ca.key
-
-apiserver.crt
-apiserver.key
-
-apiserver-kubelet-client.crt
-
-front-proxy-ca.crt
-
-front-proxy-client.crt
+            ca.crt
+            ca.key
+            
+            apiserver.crt
+            apiserver.key
+            
+            apiserver-kubelet-client.crt
+            
+            front-proxy-ca.crt
+            
+            front-proxy-client.crt
 
 etcd/
 
@@ -243,31 +243,31 @@ It reads the kubeconfig file.
 
 Usually located at:
 
-~/.kube/config
+            ~/.kube/config
 
 Inside you'll see something like:
 
-users:
-- name: kubernetes-admin
-  user:
-    client-certificate: /etc/kubernetes/pki/admin.crt
-    client-key: /etc/kubernetes/pki/admin.key
+      users:
+      - name: kubernetes-admin
+        user:
+          client-certificate: /etc/kubernetes/pki/admin.crt
+          client-key: /etc/kubernetes/pki/admin.key
 
 So the flow is:
 
-kubectl
-
-↓
-
-~/.kube/config
-
-↓
-
-admin.crt
-
-↓
-
-API Server
+            kubectl
+            
+            ↓
+            
+            ~/.kube/config
+            
+            ↓
+            
+            admin.crt
+            
+            ↓
+            
+            API Server
 
 
 
@@ -275,38 +275,38 @@ Step 9: How Does the API Server Identify You?
 ----------------------------------------------
 Suppose the certificate contains:
 
-CN = aravind
-
-O = developers
+            CN = aravind
+            
+            O = developers
 
 Kubernetes interprets this as:
-
-User = aravind
-
-Group = developers
+            
+            User = aravind
+            
+            Group = developers
 
 RBAC can then grant permissions to:
 
-User aravind
-Group developers
+            User aravind
+            Group developers
 
 Step 10: How the API Server Verifies the Certificate
 ----------------------------------------------------------
 When a request arrives, the API Server checks:
 
-Client Certificate
-        │
-        ▼
-1. Is it signed by my CA?
-        │
-2. Is it expired?
-        │
-3. Is the signature valid?
-        │
-4. Does the private key match?
-        │
-        ▼
-Authentication Success
+            Client Certificate
+                    │
+                    ▼
+            1. Is it signed by my CA?
+                    │
+            2. Is it expired?
+                    │
+            3. Is the signature valid?
+                    │
+            4. Does the private key match?
+                    │
+                    ▼
+            Authentication Success
 
 If any of these checks fail:
 
@@ -318,23 +318,23 @@ Step 11: Commands Every DevOps Engineer Should Know
 ---------------------------------------------------------
 View certificates:
 
-ls /etc/kubernetes/pki
+            ls /etc/kubernetes/pki
 
 View certificate details:
 
-openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
+            openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
 
 Check expiry:
 
-openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -dates
+            openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -dates
 
 View kubeconfig:
 
-kubectl config view
+      kubectl config view
 
 Current context:
 
-kubectl config current-context
+      kubectl config current-context
 
 🎤 Interview Questions
 --------------------------
