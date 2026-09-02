@@ -22,31 +22,31 @@ kubectl get pods -n dev
 
 The request follows this path:
 
-               kubectl
-                  │
-                  ▼
-        API Server Receives Request
-                  │
-                  ▼
-        Authentication Phase
-                  │
-        (Certificate / Token / IAM / OIDC)
-                  │
-      Is the identity valid?
-          │              │
-         YES             NO
-          │              │
-          ▼              ▼
- Authorization Phase   Reject Request
-        (RBAC)
-          │
-          ▼
- Does the user have permission?
-          │            │
-         YES          NO
-          │            │
-          ▼            ▼
- Execute API     Forbidden Error
+                     kubectl
+                        │
+                        ▼
+              API Server Receives Request
+                        │
+                        ▼
+              Authentication Phase
+                        │
+              (Certificate / Token / IAM / OIDC)
+                        │
+            Is the identity valid?
+                │              │
+               YES             NO
+                │              │
+                ▼              ▼
+     Authorization Phase   Reject Request
+            (RBAC)
+              │
+              ▼
+     Does the user have permission?
+              │            │
+             YES          NO
+              │            │
+              ▼            ▼
+     Execute API     Forbidden Error
 
 Important interview point:
 
