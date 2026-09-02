@@ -94,10 +94,35 @@ use cases:
 3. Job:
    ---
 
-it will run only once not like a cronjob
+* it will run only once not like a cronjob
 
-refer the docks from more
+* A Job is used when you want a Pod to perform a task and finish successfully.
+* The Job itself doesn't execute your command. The Pod does.
+* The Job is the controller that makes sure the required number of successful Pods eventually happens.
+3. What does "retry execution" mean?
+  "The Job will continue to retry execution of the Pods until a specified number of them successfully terminate."
 
+5. completions
+   You asked for 3 successful completions, not exactly 3 Pods.
 
-
+   Because failed Pods may cause retries.
   
+6. Running multiple Pods in parallel
+"I need 10 successful executions, but run at most 3 Pods simultaneously."
+
+8. completions vs parallelism
+
+This distinction is very important for interviews.
+
+Setting	Meaning
+completions	How many successful Pods are required
+parallelism	How many Pods can run simultaneously
+
+
+One sentence to remember
+
+Job = "Run a finite task until I get the required number of successful completions; if Pods fail, retry them, and optionally run multiple Pods in parallel."
+
+completions:  # How many successful executions do I need?
+parallelism:  # How many can run at the same time?
+backoffLimit: # How many failures/retries are allowed?
