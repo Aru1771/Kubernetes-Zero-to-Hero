@@ -39,13 +39,17 @@ Installing Containerd, runC and CNIplugin:
    ------------
 
    curl -LO https://github.com/opencontainers/runc/releases/download/v1.5.1/runc.amd64
-   sudo install -m 755 runc.amd64 /usr/local/sbin/runc
 
 
-4. CNI Pluin:
+
+       sudo install -m 755 runc.amd64 /usr/local/sbin/runc
+
+
+5. CNI Pluin:
    ----------
 
    curl -LO https://github.com/containernetworking/plugins/releases/download/v1.9.1/cni-plugins-linux-amd64-v1.9.1.tgz
-   sudo mkdir -p /opt/cni/bin
-   sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.9.1.tgz
 
+            sudo mkdir -p /opt/cni/bin
+            sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.9.1.tgz
+         
