@@ -12,9 +12,9 @@ Effects:
 ---------
 
 * we have 3 effects:
-  1. NoSchedule (new pods)
-  2. preferNoschedule (no guarentree)
-  3. noExecute (existing/ newpods)
+  1. NoSchedule (new pods): for cluster upgrades we will use this option
+  2. preferNoschedule (no guarentree): by using the we are teeling the scheduler in the worest situation only schedule a Pod in this Node) this will use for            performence issue Nodes.
+  3. noExecute (existing/ newpods): if you use this all the pods in the node will stop instently
 
 To taint the node:
 -------------------
