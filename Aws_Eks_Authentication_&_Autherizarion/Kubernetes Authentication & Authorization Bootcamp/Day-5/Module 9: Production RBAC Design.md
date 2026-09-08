@@ -2,13 +2,14 @@ Module 9: Production RBAC Design
 
 Imagine your organization has:
 ---------------------------------
-Platform Team
-DevOps Team
-Developers
-QA
-Security
-CI/CD Systems
-Monitoring
+
+      Platform Team
+      DevOps Team
+      Developers
+      QA
+      Security
+      CI/CD Systems
+      Monitoring
 
 A common RBAC design looks like this:
 --------------------------------------
