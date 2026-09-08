@@ -6,22 +6,22 @@ Some API endpoints are URLs.
 
 Examples:
 
-/healthz
-/version
-/metrics
-/livez
-/readyz
-/openapi
+      /healthz
+      /version
+      /metrics
+      /livez
+      /readyz
+      /openapi
 
 To control access to these endpoints, use nonResourceURLs.
 --------------------------------------------------------------
 Example:
 
-rules:
-- nonResourceURLs:
-  - /healthz
-  verbs:
-  - get
+    rules:
+    - nonResourceURLs:
+      - /healthz
+      verbs:
+      - get
 
 This allows:
 
@@ -37,10 +37,10 @@ Monitoring systems like Prometheus may need to scrape:
 
 You can grant only:
 
-rules:
-- nonResourceURLs:
-  - /metrics
-  verbs:
-  - get
+    rules:
+    - nonResourceURLs:
+      - /metrics
+      verbs:
+      - get
 
 instead of broader API access.
