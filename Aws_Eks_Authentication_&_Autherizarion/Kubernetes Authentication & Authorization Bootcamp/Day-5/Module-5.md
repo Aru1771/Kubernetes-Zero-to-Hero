@@ -4,50 +4,208 @@ Imagine your cluster installs many Custom Resource Definitions (CRDs).
 
 Example:
 
-Prometheus
-
-Istio
-
-Argo CD
-
-Cert Manager
+      Prometheus
+      
+      Istio
+      
+      Argo CD
+      
+      Cert Manager
 
 Each introduces new API resources.
 
-Instead of editing the built-in view, edit, or admin ClusterRoles manually, Kubernetes supports Aggregated ClusterRoles.
+Instead of editing the built-in Clutser Roles:
 
+     view, edit, or admin 
+    
+For example, the built-in view role allows a user to read normal Kubernetes resources:
+
+
+    Pods
+    Services
+    Deployments
+    ConfigMaps
+    ...
+
+Now you install Prometheus Operator.
+
+It introduces a new CRD:
+
+    ServiceMonitor
+
+The built-in view role doesn't automatically know that users should be allowed to read ServiceMonitor.
+
+So you could manually edit the view ClusterRole and add:
 Example labels:
 
-metadata:
-  labels:
+
+      - apiGroups:
+          - monitoring.coreos.com
+        resources:
+          - servicemonitors
+        verbs:
+          - get
+          - list
+          - watch
+
+But manually modifying built-in roles is not a good approach.
+
+That's where Aggregated ClusterRoles come in.
+
+What is an Aggregated ClusterRole?
+--------------------------------------
+Think of it as:
+
+"Add these RBAC permissions to an existing built-in ClusterRole."
+
+You create a separate ClusterRole containing permissions for your custom resources.
+
+For example:
+
+
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: prometheus-view
+      labels:
+        rbac.authorization.k8s.io/aggregate-to-view: "true"
+    rules:
+    - apiGroups:
+        - monitoring.coreos.com
+      resources:
+        - servicemonitors
+      verbs:
+        - get
+        - list
+        - watch
+    
+
+
+Notice this label:
+
     rbac.authorization.k8s.io/aggregate-to-view: "true"
 
-Other options include:
+This tells Kubernetes:
 
-aggregate-to-edit: "true"
+      "Take the RBAC rules from this ClusterRole and add them to the built-in view ClusterRole."
 
-aggregate-to-admin: "true"
+What happens internally?
+-------------------------
+Initially:
 
-Kubernetes automatically merges these rules into the corresponding built-in ClusterRole.
+    Built-in view ClusterRole
+            |
+            +-- Pods: get/list/watch
+            +-- Services: get/list/watch
+            +-- Deployments: get/list/watch
 
-Production Example
+You create:
 
-You install Prometheus Operator.
+    prometheus-view ClusterRole
+            |
+            +-- ServiceMonitor: get/list/watch
 
-It creates a CRD:
+with:
 
-ServiceMonitor
+    aggregate-to-view: "true"
 
-You want anyone with the built-in view role to also be able to read ServiceMonitor objects.
+Kubernetes' ClusterRole aggregation controller notices this label.
 
-Create:
+It effectively builds:
 
-kind: ClusterRole
+                       view
+                        |
+              +---------+----------+
+              |                    |
+         Normal K8s rules     Aggregated rules
+              |                    |
+            Pods              ServiceMonitor
+            Services
+            Deployments
 
-metadata:
-  labels:
-    rbac.authorization.k8s.io/aggregate-to-view: "true"
+So the effective permissions of view become:
 
-Kubernetes automatically extends the built-in view ClusterRole with those permissions.
+      view
+       |
+       +-- Pods
+       +-- Services
+       +-- Deployments
+       +-- ConfigMaps
+       +-- ServiceMonitors   <-- added by aggregation
 
-No manual editing required.
+
+There are three common aggregation labels
+------------------------------------------
+View
+rbac.authorization.k8s.io/aggregate-to-view: "true"
+
+Adds permissions to:
+
+view
+
+Usually used for read-only access.
+
+Edit
+rbac.authorization.k8s.io/aggregate-to-edit: "true"
+
+Adds permissions to:
+
+edit
+
+Usually used for resources that users need to modify.
+
+Admin
+rbac.authorization.k8s.io/aggregate-to-admin: "true"
+
+Adds permissions to:
+
+admin
+
+Usually gives broader management permissions.
+
+Important point: aggregation doesn't give access by itself
+----------------------------------------------------------
+This is a very important concept.
+
+Suppose you create:
+
+
+    kind: ClusterRole
+    metadata:
+      name: prometheus-view
+      labels:
+        rbac.authorization.k8s.io/aggregate-to-view: "true"
+    rules:
+    - apiGroups:
+        - monitoring.coreos.com
+      resources:
+        - servicemonitors
+      verbs:
+        - get
+        - list
+        - watch
+
+
+This doesn't mean every user can now read ServiceMonitors.
+
+Instead:
+
+
+    prometheus-view
+           ↓
+    aggregated into
+           ↓
+    view
+           ↓
+    users who have "view"
+           ↓
+    can now read ServiceMonitors
+
+
+So aggregation modifies the permissions contained in the target ClusterRole.
+
+The user still needs a RoleBinding or ClusterRoleBinding to the view role.
+
+
+
+
