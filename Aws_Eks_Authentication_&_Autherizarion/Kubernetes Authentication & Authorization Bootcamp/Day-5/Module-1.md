@@ -8,34 +8,36 @@ kubectl delete pod nginx
 
 The flow looks like this:
 
-kubectl delete pod nginx
-        │
-        ▼
-Authentication
-        │
-        ▼
-User Identity = dev-user
-        │
-        ▼
-Authorization (RBAC)
-
-Find all RoleBindings
-        │
-        ▼
-Find all ClusterRoleBindings
-        │
-        ▼
-Collect all Roles & ClusterRoles
-        │
-        ▼
-Merge all permissions
-        │
-        ▼
-Is delete on pods allowed?
+                        kubectl delete pod nginx
+                                │
+                                ▼
+                        Authentication
+                                │
+                                ▼
+                        User Identity = dev-user
+                                │
+                                ▼
+                        Authorization (RBAC)
+                        
+                        Find all RoleBindings
+                                │
+                                ▼
+                        Find all ClusterRoleBindings
+                                │
+                                ▼
+                        Collect all Roles & ClusterRoles
+                                │
+                                ▼
+                        Merge all permissions
+                                │
+                                ▼
+                        Is delete on pods allowed?
 
 YES → Execute
 NO  → 403 Forbidden
-Important Rule
+
+*Important Rule*
+------------------
 
 RBAC does not stop at the first RoleBinding.
 
