@@ -4,23 +4,23 @@ Normally, if a user has permission to read ConfigMaps, they can read every Confi
 
 Example:
 
-kubectl get configmaps
+    kubectl get configmaps
 
 RBAC:
 
-resources:
-- configmaps
-
-verbs:
-- get
+    resources:
+    - configmaps
+    
+    verbs:
+    - get
 
 Result:
 
-config1
-config2
-config3
-database-config
-secret-config
+      config1
+      config2
+      config3
+      database-config
+      secret-config
 
 Sometimes you don't want that.
 
@@ -34,46 +34,46 @@ Suppose your application has:
 
 ConfigMaps
 
-database-config
-application-config
-redis-config
-nginx-config
+    database-config
+    application-config
+    redis-config
+    nginx-config
 
 Your application should only read:
 
-database-config
+    database-config
 
 RBAC:
 
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-
-metadata:
-  name: app-reader
-  namespace: production
-
-rules:
-- apiGroups: [""]
-  resources:
-  - configmaps
-
-  resourceNames:
-  - database-config
-
-  verbs:
-  - get
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      
+      metadata:
+        name: app-reader
+        namespace: production
+      
+      rules:
+      - apiGroups: [""]
+        resources:
+        - configmaps
+      
+        resourceNames:
+        - database-config
+      
+        verbs:
+        - get
 
 Now:
 
 kubectl get configmap database-config
 
-✅ Allowed
+    ✅ Allowed
 
 But:
 
 kubectl get configmap redis-config
 
-❌ Forbidden
+    ❌ Forbidden
 
 Where is it used?
 
