@@ -230,4 +230,22 @@ EC2_KEY PAIR: provide key pair.
 
 Allow remote access from specific security group: select a specific security group
 
+* Review and create a worker nodes. it will take 10 to 20 min to create the nodes.
+
+
+In node group details tab:
+---------------------------
+
+Node Group ARN:
+Autoscalling group name:
+Node group IAM role ARN:
+
+
+
+Now we can see how to connect to EKS cluster from cli:
+------------------------------------------------------
+
+
+
+
 
