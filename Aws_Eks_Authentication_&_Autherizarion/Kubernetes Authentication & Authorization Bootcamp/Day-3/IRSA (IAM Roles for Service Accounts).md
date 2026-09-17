@@ -19,11 +19,11 @@ What Problem Does IRSA Solve?
 ------------------------------
 Imagine you have an application running inside an EKS Pod.
 
-+----------------------+
-|   Inventory App      |
-|                      |
-| Needs to access S3   |
-+----------------------+
+      +----------------------+
+      |   Inventory App      |
+      |                      |
+      | Needs to access S3   |
+      +----------------------+
 
 The application wants to upload files to S3.
 
@@ -51,20 +51,21 @@ Example
       data:
         AWS_ACCESS_KEY_ID: xxxx
         AWS_SECRET_ACCESS_KEY: xxxx
+   -----------------------------------
 
-Application
+      Application
+      
+      ↓
+      
+      Reads Secret
+      
+      ↓
+      
+      Uses AWS Access Key
+      
+      ↓
 
-↓
-
-Reads Secret
-
-↓
-
-Uses AWS Access Key
-
-↓
-
-Calls S3
+    Calls S3
 
 Problems
 --------
@@ -84,11 +85,11 @@ attacker gets AWS access.
 
 Secrets stored inside Kubernetes
 
-etcd
-
-↓
-
-AWS Credentials
+      etcd
+      
+      ↓
+      
+      AWS Credentials
 
 Not ideal.
 
@@ -104,24 +105,24 @@ Problem 4
 
 All Pods often shared the same credentials.
 
-Pod A
-
-↓
-
-AWS Keys
-
-↓
-
-S3
-Pod B
-
-↓
-
-Same AWS Keys
-
-↓
-
-S3
+      Pod A
+      
+      ↓
+      
+      AWS Keys
+      
+      ↓
+      
+      S3
+      Pod B
+      
+      ↓
+      
+      Same AWS Keys
+      
+      ↓
+      
+      S3
 
 Not secure.
 
@@ -135,23 +136,23 @@ AWS says:
 
 So now
 
-Pod
-
-↓
-
-ServiceAccount
-
-↓
-
-Bound JWT Token
-
-↓
-
-AWS validates it
-
-↓
-
-Returns Temporary AWS Credentials
+      Pod
+      
+      ↓
+      
+      ServiceAccount
+      
+      ↓
+      
+      Bound JWT Token
+      
+      ↓
+      
+      AWS validates it
+      
+      ↓
+      
+      Returns Temporary AWS Credentials
 
 What does IRSA stand for?
 --------------------------
@@ -411,7 +412,7 @@ Entire Flow
       
               │
               ▼
-      S3
+              S3
       
 Why is this Secure?
 
@@ -563,14 +564,15 @@ Done.
 The application now receives temporary AWS credentials automatically through the AWS SDK.
 
 Old vs IRSA
-| Old Method          | IRSA                      |
-| ------------------- | ------------------------- |
-| AWS Access Keys     | IAM Role                  |
-| Long-lived          | Temporary                 |
-| Kubernetes Secret   | Bound JWT                 |
-| Manual Rotation     | Automatic                 |
-| High Risk           | Least Privilege           |
-| Credentials in Pods | No static AWS credentials |
+
+      | Old Method          | IRSA                      |
+      | ------------------- | ------------------------- |
+      | AWS Access Keys     | IAM Role                  |
+      | Long-lived          | Temporary                 |
+      | Kubernetes Secret   | Bound JWT                 |
+      | Manual Rotation     | Automatic                 |
+      | High Risk           | Least Privilege           |
+      | Credentials in Pods | No static AWS credentials |
 
 Real Company Scenario
 ------------------------
