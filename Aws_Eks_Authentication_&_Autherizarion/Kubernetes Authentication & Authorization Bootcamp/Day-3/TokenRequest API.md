@@ -110,11 +110,11 @@ How to Create a Token
 
 Create a ServiceAccount:
 
-kubectl create serviceaccount demo-sa
+      kubectl create serviceaccount demo-sa
 
 Now request a token:
 
-kubectl create token demo-sa
+      kubectl create token demo-sa
 
 Example output:
 
@@ -138,36 +138,38 @@ or
 
 Example:
 
-Requested
+      Requested
+      
+      ↓
+      
+      30 minutes
+      
+      ↓
+      
+      Automatically expires
 
-↓
+Note: 
 
-30 minutes
-
-↓
-
-Automatically expires
-
-Note: The API server may enforce a maximum lifetime. If you request a longer duration than allowed, it can return a shorter-lived token.
+     The API server may enforce a maximum lifetime. If you request a longer duration than allowed, it can return a shorter-lived token.
       Means: But the Kubernetes API server has a maximum allowed token lifetime configured by the cluster administrator.
 
 Where is the Token Stored?
 
 Unlike the old mechanism:
 
-ServiceAccount
-
-↓
-
-API Server
-
-↓
-
-Returns Token
-
-↓
-
-No Secret Created
+      ServiceAccount
+      
+      ↓
+      
+      API Server
+      
+      ↓
+      
+      Returns Token
+      
+      ↓
+      
+      No Secret Created
 
 kubectl get secrets
 
@@ -202,27 +204,27 @@ Real Production Example
 
 Suppose a monitoring application runs in Kubernetes.
 
-Monitoring Pod
-
-↓
-
-Needs to read Pods
-
-↓
-
-Uses ServiceAccount
-
-↓
-
-Requests a temporary token
-
-↓
-
-Calls Kubernetes API
-
-↓
-
-Token expires automatically
+      Monitoring Pod
+      
+      ↓
+      
+      Needs to read Pods
+      
+      ↓
+      
+      Uses ServiceAccount
+      
+      ↓
+      
+      Requests a temporary token
+      
+      ↓
+      
+      Calls Kubernetes API
+      
+      ↓
+      
+      Token expires automatically
 
 Even if an attacker steals the token, it becomes useless after it expires.
 
