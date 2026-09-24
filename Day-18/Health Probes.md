@@ -42,13 +42,13 @@ LivenessProbe block in yaml:
 
 1. if you are using a command
 
-livenssProbe:
-  exec:
-    command:
-      - cat 
-      - /tmp/healthy
-  initialDelaySeconds: 5
-  periodicSeconds: 5 
+        livenssProbe:
+          exec:
+            command:
+              - cat 
+              - /tmp/healthy
+          initialDelaySeconds: 5
+          periodicSeconds: 5 
 
 * in this case by using a command to check from the end point we are getting the responce or not. if you delete the end point folder then this probe
   will not get any responce then probe will fail and start resating the container/pod.
@@ -78,23 +78,23 @@ livenssProbe:
 Main fields in these Probes:
 ----------------------------
 
-initialdealySeconds: it will tell when first check will start eg: after 15 sec.
-periodicSeconds: it will tell after first check when again the check need to perfrom eg: 5 sec after first check every 5 sec it will do checks.
-successThreshold: it will tell if the check is success for 2 times then it will mark as healthy
-failureThreshold: it will tell if the check is fail 3 times conitinusly then it will mark as failure.
+    **InitialdealySeconds: it will tell when first check will start eg: after 15 sec.**
+    periodicSeconds: it will tell after first check when again the check need to perfrom eg: 5 sec after first check every 5 sec it will do checks.
+    successThreshold: it will tell if the check is success for 2 times then it will mark as healthy
+    failureThreshold: it will tell if the check is fail 3 times conitinusly then it will mark as failure.
 
 
 one of the adavntage with k8s:
 ------------------------------
 
-it will automatically add some tolerances:
+it will automatically add some tolerances to Pods:
 
 1. node-notready
 2. node-unreachable
 
-* these taints will be applyed fro the node and these tollerance will be applyed fro a pod.
+* these taints will be applyed for the node and these tollerance will be applyed fro a pod.
 
-* if the node is not ready or unreachable then pods will evict the node safely and move to another node.
+* if the node is not ready or unreachable then pods will evict from the node safely and move to another node.
 
 
 
