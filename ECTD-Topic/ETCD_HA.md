@@ -2,21 +2,24 @@ one of the MOST important Kubernetes interview topics is 🤯☸️
 ================================================================
 👉 ETCD High Availability (HA)
 --------------------------------
-Because Kubernetes can survive Pod failures...
-But if etcd fails completely 💥 The entire control plane stops working...
-That's why production Kubernetes clusters focus heavily on ETCD High Availability 🔥
+
+    Because Kubernetes can survive Pod failures...
+    But if etcd fails completely 💥 The entire control plane stops working...
+    That's why production Kubernetes clusters focus heavily on ETCD High Availability 🔥
 
 💡 What is ETCD?
-ETCD is a distributed key-value database that stores the entire Kubernetes cluster state.
+
+    ETCD is a distributed key-value database that stores the entire Kubernetes cluster state.
 
 Think of it as:
-🧠 Kubernetes Brain It stores:
- 📦 Pods
- 🚀 Deployments
- 🌐 Services
- 🔐 Secrets
- ⚙️ ConfigMaps
- 🔑 RBAC Policies
+
+    🧠 Kubernetes Brain It stores:
+     📦 Pods
+     🚀 Deployments
+     🌐 Services
+     🔐 Secrets
+     ⚙️ ConfigMaps
+     🔑 RBAC Policies
 
 📂 Where is ETCD Data Stored?
 ----------------------------------
@@ -29,8 +32,9 @@ ETCD database files are stored here by default.
 -------------------------------------------
 ETCD communication is encrypted using certificates.
 Think:
-🪪 Certificate = Identity Card
-🔑 Private Key = Password
+
+    🪪 Certificate = Identity Card
+    🔑 Private Key = Password
 
 Important files:
 
