@@ -70,8 +70,123 @@ Note:
 
 
 
+| CRD                                               | CR                               |
+| ------------------------------------------------- | -------------------------------- |
+| CustomResourceDefinition                          | Custom Resource                  |
+| Defines a resource type                           | Actual instance                  |
+| Defines the schema                                | Provides values                  |
+| Usually created by platform/operator installation | Created by users/apps            |
+| `kind: CustomResourceDefinition`                  | `kind: Database`                 |
+| Defines `Database`                                | Creates `payment-db`             |
+| Defines allowed structure                         | Represents desired configuration |
 
 
+CRD: 
+
+        apiVersion: apiextensions.k8s.io/v1
+        kind: CustomResourceDefinition
+        
+        metadata:
+          name: databases.database.example.com
+        
+        spec:
+          group: database.example.com
+        
+          names:
+            kind: Database
+            plural: databases
+        
+          scope: Namespaced
+        
+          versions:
+            - name: v1
+              served: true
+              storage: true
+        
+              schema:
+                openAPIV3Schema:
+                  type: object
+                  properties:
+                    spec:
+                      type: object
+                      properties:
+                        engine:
+                          type: string
+                        version:
+                          type: string
+                        storage:
+                          type: string
 
 
+Create a CR:
 
+
+        apiVersion: database.example.com/v1
+        kind: Database
+        
+        metadata:
+          name: payment-db
+          namespace: production
+        
+        spec:
+          engine: postgres
+          version: "16"
+          storage: 20Gi
+
+Controller:
+-----------
+
+* Controller will watch the desired state what we have mentioned in the CR.yaml file and reconcile it accordingly
+
+* it will identify the diff b/w the actual state and desired state. then it will take action accordingly.
+
+* Desired State: What the user says they want.
+* Actual State: What currently exists in the cluster.
+
+* So conceptually: controller will
+
+            Observe
+               ↓
+            Compare
+               ↓
+            Act
+               ↓
+            Observe again
+
+             
+* Kubernetes controllers interact with the API Server and receive information about resource changes.
+
+K8S-API Server Responsible for:
+
+        Receiving API requests
+        Validation
+        Authentication/authorization
+        Admission
+        Reading/writing cluster state
+
+Controller Responsible for:
+
+        Watching resources
+        Understanding desired state
+        Comparing with actual state
+        Taking corrective action
+* Controllers react to both directions of change: at Actual state and desired state.
+
+* Controller Doesn't Just "Create Things"
+  
+        Create
+        Update
+        Delete
+* Controller Doesn't Directly Change etcd: The controller normally interacts with the Kubernetes API Server.
+
+      Controller → API Server → etcd
+
+* The Word "Reconciliation": 
+
+        Reconciliation means bringing the actual state toward the desired state.
+
+* Controller Does Not Guarantee Instant Correction
+
+        The controller is not necessarily instantaneous.
+        
+        There can be a small delay:
