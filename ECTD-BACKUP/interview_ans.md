@@ -69,6 +69,10 @@ for Velero :
     ec2:DeleteSnapshot
 
 
+Flow: 
+
+    "Velero detects the PVC and uses Kubernetes CSI snapshot APIs. The appropriate VolumeSnapshotClass identifies the EBS CSI driver. The CSI snapshot controller                 and EBS CSI driver then handle the snapshot operation, resulting in an AWS EBS snapshot."
+
 So, in summary:
 
 **etcdctl → Kubernetes cluster state**
