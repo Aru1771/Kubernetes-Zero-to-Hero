@@ -59,7 +59,8 @@ Networking:
 Configuring Observbility:
 -------------------------
 
-    Enable Promitheus 
+    Enable Promitheus or cloudwatch
+    enable network monitoring
     Control plane logging: Enble all logs of master plane.
 
 
