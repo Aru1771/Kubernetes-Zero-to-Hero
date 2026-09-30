@@ -44,12 +44,18 @@ EKS Clutser Creation:
       Cluster_Role: created in the above step.
       Kubernets Version: selectect last version not latest.
       Upgrade Policy: Extend and standerd --> select standerd and for cost opt update cluster every 3 months.
+      EKS Auto Mode: need to learn
+      Control Plane Scaling: need to learn
+      Controle Plane configration: need to learn
+      Delete protection: need to learn
+      ARC Zonal shift: need to learn
       Cluter access: 
       Bootstrap cluster admin access: Allow cluster admin access
       cluster authentication mode: EKS api and configMap
 
 Networking:
 ------------
+
       VPC: Select the vpc
       Subnets: select private subnets min 4 to 6 for high availability.
       Security Group: select default because once we create the eks cluster it will create one security group. in real time we use seperate sg.
@@ -70,7 +76,9 @@ Add-on's:
 
     1. CoreDNS
     2. Kube-Proxy
-    3. Amazon VPC-CNI
+    3. Amazon VPC-CNI --> need iam role with policy **AWS_EKS_CSI_Policy**
+    4. CSI snapshot drivers
+    5. EBS CSI drivers -----> need iam role with policy **AWS_EKS_EBS_Strorage_Policy**
 
 Configure-selected add-ons settings:
 ---------------------------------------
@@ -159,8 +167,9 @@ IAM role creation before creating the worker node:
     Required policies:
     
     1. Amazon Eks WorkerNode Policy
-    2. Amazon ec2 container rigistery policy
+    2. Amazon ec2 container rigistery Read only policy
     3. Amazon EKS_CNI_Policy
+    4. Amazon elastic_container_rigistery_Public Read only policy
 
     Role_Name: Role_Name
 
