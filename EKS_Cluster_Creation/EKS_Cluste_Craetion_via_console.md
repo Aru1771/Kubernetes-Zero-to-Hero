@@ -26,12 +26,12 @@
       
       * we have to create one IAM role for a cluster with AWS_EKS_CLUSTER_POLICY
 
-IAM role creation:
--------------------
+Clusrer-IAM role creation:
+---------------------------
 
     Trusted entry: Aws service --> EKS
     Use case: EKS --> EKS_CLUSTER
-    Policy:  AWS_EKS_CLUSTER_POLICY
+    Policy:  AWS_EKS_CLUSTER_POLICY, AWS_EKS_NetworkPolicy, AWS_EKS_EBS_Strorage_Policy, AWS_EKS_Compute_Policy, AWS_EKS_LoadBalancer_Policy
     Role_Name: Role_Name
 
 
