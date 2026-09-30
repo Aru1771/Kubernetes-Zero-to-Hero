@@ -160,13 +160,48 @@ cmd: kubectl create -f dp.yaml
 
 * if you want to see rollout history:
   -----------------------------------
-  kubectl rollout history deployment deployment_name
+  
+       kubectl rollout history deployment deployment_name
 
 * if you want to rollback changes:
   ---------------------------------
-  kubeclt rollout undo deployment deployment_name
+  
+      kubeclt rollout undo deployment deployment_name
 
-Note: if you want to create a yaml file from the imparative command
+* To see more detail about a particular revision:
+
+      kubectl rollout history deployment nginx --revision=2
+
+* How do we check rollout status:
+
+      kubectl rollout status deployment nginx
+
+
+       | Command                                                 | Purpose                          |
+       | ------------------------------------------------------- | -------------------------------- |
+       | `kubectl rollout status deployment nginx`               | Check rollout progress           |
+       | `kubectl rollout history deployment nginx`              | View revision history            |
+       | `kubectl rollout undo deployment nginx`                 | Roll back                        |
+       | `kubectl rollout undo deployment nginx --to-revision=2` | Roll back to a specific revision |
+       | `kubectl rollout pause deployment nginx`                | Pause rollout                    |
+       | `kubectl rollout resume deployment nginx`               | Resume rollout                   |
+
+
+
+Note: 
+
+     if you want to create a yaml file from the imparative command
+     Kubernetes keeps Deployment revision information so you can move back to a previous version when needed.
+     Deployment
+     │
+     ├── RS-v1 → nginx:1.25 → 0 Pods
+     ├── RS-v2 → nginx:1.26 → 0 Pods
+     └── RS-v3 → nginx:1.27 → 3 Pods
+     
+
+     
+
+
 
 kubectl create deployment deploymet_name --image=image_name --dry-run=client -o yaml > dp.yaml
 
