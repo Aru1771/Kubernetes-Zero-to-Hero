@@ -286,3 +286,42 @@ For example:
 
 
 "What does payment-db want, and what actually exists?"
+The API Server itself doesn't exactly "create the event and forward it directly to the controller."
+
+            CR changes
+                ↓
+          Kubernetes API
+                ↓
+         Watch notification
+                ↓
+         Controller receives
+             the event
+                ↓
+           Work Queue
+                ↓
+            Reconcile
+                ↓
+       Compare desired vs actual
+                ↓
+           Take action
+
+For example:
+
+    payment-db
+    storage: 20Gi → 50Gi
+            ↓
+    Controller is notified
+            ↓
+    Event: payment-db changed
+            ↓
+    Queue: payment-db
+            ↓
+    Reconcile(payment-db)
+            ↓
+    Controller checks current state
+            ↓
+    PVC needs to be 50Gi
+            ↓
+    Take corrective action
+
+A change is observed through the watch → the controller receives an event → the resource is placed into the work queue → the controller processes it through reconciliation → it compares desired and actual state → it takes the required action.
