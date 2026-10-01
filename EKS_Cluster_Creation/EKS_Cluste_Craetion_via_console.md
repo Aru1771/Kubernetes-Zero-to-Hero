@@ -257,6 +257,21 @@ Node group IAM role ARN:
 Now we can see how to connect to EKS cluster from cli:
 ------------------------------------------------------
 
+* First we have install AWS CLI and Kubectl in Users Mechine.
+
+* Configure AWS credentials
+
+* install kubectl
+
+* After installing the Kubectl if we Run any command related to Kubectl, first it will search for a file called "config" where this file will availble in our mechine in "root folder/.kube/config"--> t this the actual path where the config file was available.
+
+* what this config file contains ?
+
+In config file we have the info to which cluster we have to connect. if this file was not there in our mechine then our kubectl request will not reach to our cluster.
+
+* How we can create that Config file our mechine ?
+
+To create that config file we have to use a command: aws eks update-kubeconfig --region clutser_region --name cluster_name
 
 
 
