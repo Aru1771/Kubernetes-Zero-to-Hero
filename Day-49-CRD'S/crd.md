@@ -185,8 +185,104 @@ Controller Responsible for:
 
         Reconciliation means bringing the actual state toward the desired state.
 
-* Controller Does Not Guarantee Instant Correction
-
         The controller is not necessarily instantaneous.
         
         There can be a small delay:
+
+
+* A CRD defines what the custom resource looks like; a CR declares the desired state; a controller gives that resource behavior by continuously reconciling it.
+  Controller Does Not Guarantee Instant Correction.
+
+  Custom Controller Internals
+  ---------------------------
+
+  * The basic internal flow is:
+ 
+            Kubernetes API Server
+                 │
+                 │ Watch
+                 ▼
+              Event
+                 │
+                 ▼
+            Work Queue
+                 │
+                 ▼
+             Reconcile
+                 │
+                 ▼
+        Compare Desired
+          vs Actual
+                 │
+                 ▼
+        Take Corrective Action
+                 │
+                 ▼
+        Kubernetes API Server
+
+
+* There are 4 important pieces:
+
+* Watch: The controller needs to know when something changes.
+
+Conceptually:
+
+        Database Controller
+                │
+                │ "Tell me when Database objects change"
+                ▼
+        Kubernetes API Server
+        
+Instead, it establishes a watch relationship with the Kubernetes API.
+So when something happens, the API machinery can notify the controller.
+
+
+* Event: When a watched resource changes, an event occurs.
+
+For example:
+
+Event 1 — Database created
+
+        payment-db created
+               ↓
+           CREATE event
+
+Event 2 — Database modified
+
+        storage: 20Gi → 50Gi
+               ↓
+           UPDATE event
+
+Work Queue: Conceptually, controllers usually place work into a work queue.
+
+The queue might contain:
+
+        payment-db
+        orders-db
+        inventory-db
+The controller worker takes an item from the queue:
+
+        Work Queue
+            │
+            │ get next item
+            ▼
+        payment-db
+            │
+            ▼
+        Reconcile(payment-db)
+
+Because many things can happen at the same time so we are using queue.
+
+* Reconcile: The controller takes an item from the queue and calls Reconcile.
+
+For example:
+
+        Queue
+          ↓
+        payment-db
+          ↓
+        Reconcile(payment-db)
+
+
+
+"What does payment-db want, and what actually exists?"
