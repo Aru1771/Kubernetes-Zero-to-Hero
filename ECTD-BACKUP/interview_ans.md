@@ -42,7 +42,12 @@ Option 1 — Let Velero create the ServiceAccount
         --backup-location-config region=us-east-1 \
         --service-account-name velero \
         --pod-annotations "eks.amazonaws.com/role-arn=arn:aws:iam::<ACCOUNT_ID>:role/VeleroBackupRole"
-option: 2
+
+* While creating the IAM role itself we have to provide the trust entry in iam role for this velero service account.
+
+  
+option: 2 - this is the best approch
+
 If you create the ServiceAccount yourself, make sure the namespace and ServiceAccount name match what Velero uses:
       
       velero install \
