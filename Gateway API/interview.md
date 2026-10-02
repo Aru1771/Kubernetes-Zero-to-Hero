@@ -37,3 +37,89 @@ If TLS passthrough is required, the Gateway does not terminate the TLS connectio
 So the overall traffic flow is:
 
 Client → Gateway → Route → Service → Pod.
+
+
+
+
+
+
+
+==============================================================================
+How we can use this gateway api traffic routing behavior in deployment statages
+=================================================================================
+
+Gateway API can be used to control traffic routing during different application deployment strategies, especially for microservices.
+
+**1. Blue-Green Deployment**
+
+In a blue-green deployment, we run two versions of the application at the same time.
+
+For example:
+
+* Blue → current production version
+* Green → new application version
+
+We can use Gateway API routing to send traffic to the required backend Service. Once the new version is validated, we can change the routing from the Blue Service to the Green Service.
+
+**2. Canary Deployment**
+
+In a canary deployment, we gradually introduce a new version of an application.
+
+For example:
+
+* Version 1 → 90% traffic
+* Version 2 → 10% traffic
+
+Gateway API supports traffic splitting through `backendRefs` and weights in an `HTTPRoute`. This allows us to gradually shift traffic toward the new version.
+
+For example:
+
+```yaml
+backendRefs:
+- name: app-v1
+  port: 80
+  weight: 90
+
+- name: app-v2
+  port: 80
+  weight: 10
+```
+
+We can then gradually increase the weight of the new version after validating its behavior.
+
+**3. Rolling Update**
+
+Rolling update is primarily a Kubernetes Deployment strategy rather than a Gateway API deployment strategy.
+
+Kubernetes gradually replaces old Pods with new Pods while maintaining application availability.
+
+For example:
+
+```text
+Old Pods:  v1 v1 v1
+              ↓
+Rolling update
+              ↓
+New Pods:  v2 v2 v2
+```
+
+Gateway API can continue routing traffic to the Kubernetes Service while the Deployment performs the rolling update.
+
+So, in a real environment, we can use:
+
+```text
+Argo CD / Kubernetes Deployment
+        ↓
+Creates and manages application versions
+        ↓
+Gateway API
+        ↓
+Controls traffic routing
+        ↓
+Kubernetes Services
+        ↓
+Pods
+```
+
+
+
