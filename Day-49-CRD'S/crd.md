@@ -325,3 +325,14 @@ For example:
     Take corrective action
 
 A change is observed through the watch → the controller receives an event → the resource is placed into the work queue → the controller processes it through reconciliation → it compares desired and actual state → it takes the required action.
+
+* There are three common resource lifecycle events:
+  
+        | Event    | Meaning                 |
+        | -------- | ----------------------- |
+        | `CREATE` | A resource was created  |
+        | `UPDATE` | A resource was modified |
+        | `DELETE` | A resource was deleted  |
+
+* The event triggers reconciliation; the reconciliation logic decides what to do.
+
