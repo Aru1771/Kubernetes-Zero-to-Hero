@@ -336,3 +336,369 @@ A change is observed through the watch → the controller receives an event → 
 
 * The event triggers reconciliation; the reconciliation logic decides what to do.
 
+Owner References
+-----------------
+
+1. First: What problem does OwnerReference solve?
+
+Imagine our Database CR:
+
+    apiVersion: database.example.com/v1
+    kind: Database
+    metadata:
+      name: payment-db
+    spec:
+      version: "16"
+      storage: 20Gi
+
+Our Database Controller creates:
+
+    Database CR
+        ↓
+    StatefulSet
+        ↓
+    Pods
+
+Now Kubernetes needs to understand:
+
+Which StatefulSet belongs to which Database?
+
+And:
+
+Which Pods belong to which StatefulSet?
+
+This is where OwnerReference comes in.
+
+What is OwnerReference?
+
+    An OwnerReference is metadata that establishes an ownership relationship between Kubernetes resources.
+
+For example:
+
+    Database CR
+         │
+         │ owns
+         ▼
+    StatefulSet
+
+The StatefulSet can contain an OwnerReference pointing to the Database CR.
+
+Conceptually:
+
+    metadata:
+      ownerReferences:
+        - apiVersion: database.example.com/v1
+          kind: Database
+          name: payment-db
+          uid: <database-uid>
+
+This tells Kubernetes:
+
+    "payment-db is the owner of this StatefulSet."
+
+Parent and Child
+
+It's useful to think of OwnerReferences as:
+
+    Parent
+      ↓
+    Child
+
+Example:
+
+    Database CR          ← Parent / Owner
+         ↓
+    StatefulSet           ← Child
+         ↓
+    Pod                   ← Child
+
+Or with the built-in Deployment example:
+
+    Deployment
+        ↓
+    ReplicaSet
+        ↓
+    Pod
+
+The relationships are approximately:
+
+    Deployment
+       │
+       └── owns ReplicaSet
+                 │
+                 └── owns Pod
+
+Why can't we just use labels?
+
+Good question.
+
+Labels can tell us:
+
+    labels:
+      app: payment
+
+and a selector can find:
+
+    all resources with app=payment
+
+But labels do not establish Kubernetes ownership.
+
+OwnerReference specifically tells Kubernetes:
+
+This object is owned by that object.
+
+        | Labels/Selectors                    | OwnerReference               |
+        | ----------------------------------- | ---------------------------- |
+        | Helps identify/select resources     | Establishes ownership        |
+        | Used by Services, controllers, etc. | Used for ownership/lifecycle |
+        | "Which objects match?"              | "Who owns this object?"      |
+
+
+Garbage Collection
+
+This is one of the biggest reasons OwnerReferences are important.
+
+Suppose:
+
+    Database CR
+        ↓ owns
+    StatefulSet
+
+Now you delete the Database CR:
+
+    kubectl delete database payment-db
+
+What should happen to the StatefulSet?
+
+    If the StatefulSet is owned by the Database CR, Kubernetes can use garbage collection to clean up dependent resources according to the deletion policy.
+
+Conceptually:
+
+    Delete Database CR
+            ↓
+    Kubernetes sees OwnerReference
+            ↓
+    StatefulSet is dependent
+            ↓
+    Garbage Collection
+            ↓
+    StatefulSet removed
+
+This prevents orphaned resources.
+
+Without OwnerReference
+
+Imagine:
+
+    Database CR
+         ↓
+    Controller creates
+         ↓
+    StatefulSet
+
+But there is no ownership relationship.
+
+Now:
+
+    Delete Database CR
+    
+    The StatefulSet might remain.
+
+You could end up with:
+
+    Database CR ❌
+    StatefulSet  ✅
+    Pods         ✅
+    PVC          ✅
+
+These are potentially orphaned resources.
+
+That is undesirable.
+
+With OwnerReference
+
+With ownership:
+
+    Database CR
+         │
+         │ ownerReference
+         ▼
+    StatefulSet
+         │
+         ▼
+    Pods
+
+When the parent is deleted, Kubernetes can clean up dependents according to garbage-collection behavior.
+
+So:
+
+    Database CR ❌
+         ↓
+    StatefulSet ❌
+         ↓
+    Pods ❌
+
+This is one reason OwnerReferences are heavily used by controllers.
+
+Real Deployment Example
+
+You already know:
+
+    Deployment
+        ↓
+    Deployment Controller
+        ↓
+    ReplicaSet
+        ↓
+    ReplicaSet Controller
+        ↓
+    Pod
+
+OwnerReferences help establish relationships such as:
+
+    Deployment
+       │
+       │ owns
+       ▼
+    ReplicaSet
+       │
+       │ owns
+       ▼
+    Pod
+
+So Kubernetes knows:
+
+    This ReplicaSet belongs to this Deployment.
+    This Pod belongs to this ReplicaSet.
+
+OwnerReference vs Selector
+
+    This is something you should be able to explain in an interview.
+    
+    Selector
+    
+    A selector asks:
+    
+        Which resources match these labels?
+    
+    Example:
+    
+        selector:
+          matchLabels:
+            app: payment
+    
+    Meaning:
+    
+        Find resources with:
+        app=payment
+    
+    OwnerReference
+    
+    OwnerReference asks:
+    
+        Which resource owns me?
+    
+    Example:
+    
+        StatefulSet
+        ownerReferences:
+          Database/payment-db
+    
+    Meaning:
+    
+        StatefulSet belongs to Database/payment-db
+    
+    Simple memory trick
+    
+        Selector       → "Who matches me?"
+        OwnerReference → "Who owns me?"
+    
+    OwnerReference contains important information
+
+A typical OwnerReference contains information such as:
+
+    ownerReferences:
+      - apiVersion: database.example.com/v1
+        kind: Database
+        name: payment-db
+        uid: 12345678-....
+        controller: true
+        blockOwnerDeletion: true
+
+uid
+
+    Uniquely identifies that specific object.
+    
+    This is important because names can potentially be reused.
+
+    Why UID?
+
+    Suppose:
+    
+    Database payment-db
+    UID = ABC
+    
+    You delete it.
+    
+    Later you create another:
+    
+    Database payment-db
+    UID = XYZ
+    
+    Same name, but different object.
+    
+    OwnerReference uses the UID to identify the exact owner object.
+    
+    So:
+    
+    payment-db + UID ABC
+    
+    is different from:
+    
+    payment-db + UID XYZ
+    
+    This prevents ownership ambiguity.
+
+Controller + OwnerReference
+
+    Now connect this to everything we've learned.
+    
+    Suppose:
+    
+    Database CR
+    
+    is created.
+
+    The Database Controller:
+
+    Watch Database CR
+            ↓
+    Event
+            ↓
+    Queue
+            ↓
+    Reconcile
+            ↓
+    Create StatefulSet
+            ↓
+    Set OwnerReference
+    
+    So:
+
+    Database CR
+         │
+         │ ownerReference
+         ▼
+    StatefulSet
+    
+    Now the controller has both:
+    
+    Reconciliation
+    "Is the desired state correct?"
+    
+    and
+    
+    Ownership
+    "Which resources belong to this CR?"
+
+These concepts work together.
