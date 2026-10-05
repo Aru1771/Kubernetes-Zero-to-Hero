@@ -659,6 +659,30 @@ uid
     
     This prevents ownership ambiguity.
 
+
+
+controller: true
+
+    This indicates that this OwnerReference represents the controlling owner of the dependent object.
+    
+    Example:
+    
+    Database CR
+         ↓
+    StatefulSet
+    
+    The StatefulSet may have:
+    
+    controller: true
+    
+    Meaning:
+    
+    This Database is the controlling owner of this StatefulSet.
+    
+    A dependent generally has at most one controlling owner.
+    
+    There can be owner references without being the controlling owner, but we'll keep that distinction simple for now.
+
 Controller + OwnerReference
 
     Now connect this to everything we've learned.
@@ -702,3 +726,69 @@ Controller + OwnerReference
     "Which resources belong to this CR?"
 
 These concepts work together.
+
+blockOwnerDeletion: true
+
+    The dependent indicates that the owner should not be fully deleted until this dependent is handled according to the garbage collector's deletion process.
+
+        OwnerReference
+        Who owns me?
+        controller: true
+        Who is my controlling owner?
+        blockOwnerDeletion: true
+        Should this dependent participate in blocking
+        complete owner deletion during garbage collection?
+
+Garbage Collection & Cascading Deletion
+
+
+    What is Garbage Collection?
+    
+    Kubernetes has a mechanism called the Garbage Collector.
+    
+    Its job includes cleaning up dependent objects when their owners are deleted, based on their ownership relationships and deletion policy.
+   
+    Cascading Deletion
+
+    When deleting an owner causes its dependent resources to be deleted, we call this cascading deletion.
+
+    Two deletion behaviors you should know
+
+    Kubernetes supports different cascading deletion behaviors.
+    
+    For now, understand these two:
+    
+    Background deletion
+    
+    The owner is deleted first, and Kubernetes garbage collection cleans up dependents afterward.
+    
+    Conceptually:
+    
+    Delete Owner
+         ↓
+    Owner disappears
+         ↓
+    Garbage Collector
+         ↓
+    Delete dependents
+    Foreground deletion
+    
+    Kubernetes ensures dependents are deleted before the owner is fully removed.
+    
+    Conceptually:
+    
+    Delete Owner
+         ↓
+    Delete dependents
+         ↓
+    Dependents gone
+         ↓
+    Owner fully removed
+    
+    You don't need to memorize the internal implementation yet.
+    
+    Just remember:
+    
+    Background = owner goes away, dependents are cleaned up afterward.
+    
+    Foreground = dependents are cleaned up before the owner is completely removed.
