@@ -792,3 +792,82 @@ Garbage Collection & Cascading Deletion
     Background = owner goes away, dependents are cleaned up afterward.
     
     Foreground = dependents are cleaned up before the owner is completely removed.
+
+
+Day 10 — spec vs status
+
+
+        apiVersion: database.example.com/v1
+        kind: Database
+        metadata:
+          name: payment-db
+        
+        spec:
+          engine: postgres
+          version: "16"
+          storage: 20Gi
+        
+        status:
+          phase: Ready
+          message: Database is running
+        
+        
+                        Database CR
+                           │
+                  ┌────────┴────────┐
+                  ↓                 ↓
+                spec              status
+                  │                 │
+                  ↓                 ↑
+           Desired State      Observed State
+                  │                 │
+                  └───────┐   ┌─────┘
+                          ↓   ↑
+                      Controller
+                          │
+                          ↓
+                      Reconcile
+                          │
+                          ↓
+                  Actual Resources
+        
+        What is spec?
+        
+        spec describes what the user wants.
+        
+        For example:
+        
+        spec:
+          engine: postgres
+          version: "16"
+          storage: 20Gi
+        
+        The user is saying:
+        
+        "I want a PostgreSQL 16 database with 20Gi storage."
+        
+        So:
+        
+        spec = desired state
+        
+        Usually, the user or another client changes the spec.
+        
+        . What is status?
+        
+        status describes what the controller has observed about the current state.
+        
+        For example:
+        
+        status:
+          phase: Ready
+          message: Database is running
+        
+        The controller is saying:
+        
+        "I checked the resources, and the database is currently running."
+        
+        So:
+        
+        status = controller-reported observed state
+        
+        Usually, the controller updates the status.
