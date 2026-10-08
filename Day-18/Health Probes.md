@@ -56,29 +56,29 @@ LivenessProbe block in yaml:
 
 
 2. if you are using a HTTP protocol:
-
-livenssProbe:
-  httpGet:
-    command:
-      path: /health 
-      port: 8000
-  initialDelaySeconds: 5
-  periodicSeconds: 5 
+      
+        livenssProbe:
+          httpGet:
+            command:
+              path: /health 
+              port: 8000
+          initialDelaySeconds: 5
+          periodicSeconds: 5 
 
 
 3. if you are using a TCP protocol:
 
-livenssProbe:
-  tcpSocket:
-      port: 8000
-  initialDelaySeconds: 15
-  periodicSeconds: 5 
+      livenssProbe:
+        tcpSocket:
+            port: 8000
+        initialDelaySeconds: 15
+        periodicSeconds: 5 
 
 
 Main fields in these Probes:
 ----------------------------
 
-    **InitialdealySeconds: it will tell when first check will start eg: after 15 sec.**
+    InitialdealySeconds: it will tell when first check will start eg: after 15 sec.**
     periodicSeconds: it will tell after first check when again the check need to perfrom eg: 5 sec after first check every 5 sec it will do checks.
     successThreshold: it will tell if the check is success for 2 times then it will mark as healthy
     failureThreshold: it will tell if the check is fail 3 times conitinusly then it will mark as failure.
