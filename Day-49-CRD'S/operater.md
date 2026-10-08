@@ -135,7 +135,7 @@ cert-manager
     Certificate
           ↓
     Secret
-Prometheus Operator
+Prometheus Operator:
 
     Manages Prometheus monitoring resources.
     
@@ -144,7 +144,7 @@ Prometheus Operator
     Prometheus Operator
           ↓
     Prometheus deployment/configuration
-Strimzi
+Strimzi: 
 
     Manages Apache Kafka on Kubernetes.
     
@@ -153,3 +153,107 @@ Strimzi
     Strimzi Operator
        ↓
     Kafka cluster
+
+CloudNativePG:
+
+Automates PostgreSQL cluster deployment and lifecycle management.
+
+
+We'll study each using the same approach: problem → CRD/CR → Operator → reconciliation → actual resources.
+
+Operator 1 — cert-manager
+-------------------------
+
+Let's start with a real production use case.
+
+The problem
+
+Suppose you deploy an application on Kubernetes and expose it using HTTPS:
+
+        https://app.example.com
+
+For HTTPS to work correctly, you need a TLS certificate.
+
+Without automation, an administrator may need to:
+
+    Request a certificate from a certificate authority.
+    
+    Configure the certificate and private key.
+    
+    Store them in a Kubernetes Secret.
+    
+    Renew the certificate before it expires.
+    
+    Update the Secret when the certificate changes.
+
+This creates repetitive operational work and risks certificate expiry.
+
+cert-manager automates much of this lifecycle.
+
+How cert-manager works:
+
+
+Certificate CR:
+    
+    User requests a certificate
+
+Example Certificate CR:
+
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: app-certificate
+      namespace: production
+    spec:
+      secretName: app-tls  ----->Secret where certificate material is stored
+      dnsNames:
+        - app.example.com   -----> Domain names the certificate should cover
+      issuerRef:              --------> Certificate issuer to use
+        name: letsencrypt-prod
+        kind: ClusterIssuer
+
+
+The custom resource type
+
+secretName: app-tls
+
+	
+
+Secret where certificate material is stored
+
+dnsNames
+
+	
+
+Domain names the certificate should cover
+
+issuerRef
+
+	
+
+Certificate issuer to use
+cert-manager Controller:
+    
+    Watches resources and reconciles desired state
+    
+Certificate Issuance:
+    
+    Uses an Issuer or ClusterIssuer
+    
+Kubernetes TLS Secret:
+    
+    Stores the certificate and private key
+
+
+Flow:
+
+    The user applies the Certificate CR.
+    
+    The Kubernetes API Server validates and stores the resource.
+    The cert-manager controller observes the resource and reconciles it.
+    cert-manager works with the configured issuer to request and obtain the certificate.
+    
+    The certificate and private key are stored in the app-tls Secret.
+    
+    cert-manager tracks certificate status and renews it when needed.
+        
