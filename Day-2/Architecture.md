@@ -233,13 +233,13 @@ Actual Flow:
 4. CoreDNS
 
 
-1. The Watcher (Control Plane)
+* The Watcher (Control Plane)
 
          Just like kube-proxy, CoreDNS constantly watches the Kubernetes API server.
          • Whenever a new Service is created, CoreDNS automatically generates a DNS record for it.
          • It follows a strict naming convention: <service-name>.<namespace>.svc.<cluster-domain>.
 
-2. The Resolution Flow (The Step-by-Step)
+* The Resolution Flow (The Step-by-Step)
 
          When Service 1 wants to talk to Service 2, CoreDNS steps in before any network packets are even routed:
          1. The Question: Inside Pod 1, your application code tries to connect to http://cluster.local.
