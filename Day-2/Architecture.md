@@ -182,13 +182,39 @@ in k8s the lowest level of deployment is POD. Pod is just like a wraper to our c
    3. Kube-Proxy:
        -----------
        * it will provide networking, IP address to pods and load balacing in k8s. it will usese Ip tables in linux machine.
-      
-      
+       * kube-proxy acts as a data-plane controller that writes the routing rules on each node so that the Linux kernel handles the actual traffic routing.
+       * kube-proxy runs on every single node in your cluster. It constantly watches the Kubernetes API server for two things:
+         1. When a new Service is created (and assigned a ClusterIP).
+         2. When Pods (Endpoints) are added, removed, or change health status.
+      * The Rule Maker (Data Plane Role)
+      * When kube-proxy detects a change, it updates the low-level networking rules on its host node. Depending on your cluster configuration, it uses either:
+         • IPVS (IP Virtual Server): L4 load balancing built into the Linux kernel (standard for modern/large clusters).
+         • iptables: A Linux packet filtering system.
+
+      * It translates a high-level concept like "Send traffic for 10.96.0.1 to these 3 pods" into low-level firewall/routing rules.
+      * The Traffic Flow (What happens to your request)
+
+         Because kube-proxy already configured the node's kernel rules ahead of time:
+         1. Your application sends a packet to the Service IP (payments.default.svc.cluster.local).
+         2. The packet hits the Linux kernel of the host node.
+         3. The kernel looks at the iptables or IPVS rules created by kube-proxy.
+         4. The kernel intercepts the packet, changes the destination IP from the Service IP to one of the healthy Pod IPs (performing DNAT / Destination Network               Address Translation), and load-balances the request.
+         5. The packet goes directly to the Pod
+               
 
    
       
-      
-      
+            Scenario 2: Pod-to-Service Communication
+            
+            When a Pod behind Service 1 tries to send a request to payments.default.svc.cluster.local, the traffic never leaves the Kubernetes network engine. It               all happens at the Linux kernel level:
+            1. The Request Leaves Pod 1: Pod 1 sends an HTTP request addressed to the Service 2 ClusterIP (e.g., 10.96.0.1).
+            2. Hitting the Host Kernel: The packet leaves the Pod's virtual network interface and enters the host node's Linux kernel.
+            3. The Kernel Inspection: The kernel checks its iptables or IPVS rules (which kube-proxy previously wrote). It sees a rule that says: "If traffic is                   destined for 10.96.0.1, intercept it."
+            4. DNAT (Destination Network Address Translation): The kernel randomly selects one of the healthy backend Pod IPs belonging to Service 2 (e.g.,                        192.168.1.45) based on its load-balancing algorithms. It alters the packet header, changing the destination from the Service IP to the specific                     Pod IP.
+            5. Direct Delivery: The packet is then routed across the cluster network directly to the node hosting that specific Service 2 Pod.
+            
+                  
+                  
 
 
 
