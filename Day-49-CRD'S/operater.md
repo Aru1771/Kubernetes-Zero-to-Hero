@@ -257,3 +257,138 @@ Flow:
     
     cert-manager tracks certificate status and renews it when needed.
         
+Operator Architecture and Lifecycle
+--------------------------------------
+
+	1. User / DevOps Engineer
+	
+	Defines the desired database configuration
+	
+	2. Custom Resource (CR)
+	
+	For example, payment-db
+	
+	3. Kubernetes API Server
+	
+	Validates requests and stores resource state
+	
+	4. Operator Controller
+	
+	Watches resources and reconciles desired vs actual state
+	
+	5. Managed Kubernetes Resources
+	
+	StatefulSets or Pods, Services, PVCs, Secrets, etc.
+	
+	6. Status and Conditions
+	
+	Report the observed state of the application
+
+One important detail: the API Server doesn't directly call the Operator every time a CR is created. The Operator watches relevant resources through Kubernetes API mechanisms and reconciles them.
+
+The main components
+--------------------
+
+A. CRD — CustomResourceDefinition
+	
+	The CRD defines a new resource type that Kubernetes can recognize.
+	
+	Example:
+	
+	kind: Database
+	
+	The CRD specifies the resource's schema, supported versions, and whether it is namespaced or cluster-scoped.
+
+B. CR — Custom Resource
+
+	The CR is the actual object created by the user.
+	
+	apiVersion: database.example.com/v1
+	kind: Database
+	metadata:
+	  name: payment-db
+	spec:
+	  engine: postgres
+	  version: "16"
+	  storage: 20Gi
+	
+	This declares the desired configuration. It doesn't create PostgreSQL by itself.
+
+C. Operator controller
+
+	The controller watches the CR and relevant managed resources.
+	
+	Its job is to:
+	
+	Read the desired state.
+	
+	Observe the current cluster state.
+	
+	Compare the two.
+	
+	Create, update, or remove resources as needed.
+	
+	Report the result in status and Conditions.
+
+D. Managed resources
+
+	Depending on the Operator design, it may manage resources such as:
+	
+	StatefulSets and Pods
+	
+	Services
+	
+	PersistentVolumeClaims
+	
+	Secrets and ConfigMaps
+	
+	Jobs used for backup or maintenance
+
+E. Status and Conditions
+
+	These help users and automation understand what is happening.
+	
+	For example:
+	
+	status:
+	  conditions:
+	    - type: Ready
+	      status: "True"
+	      reason: DatabaseReady
+	      message: Database is accepting connections
+	
+	The exact fields depend on the Operator's API.
+
+
+
+What happens during the Operator lifecycle?
+--------------------------------------------
+
+Imagine you're deploying a database for the first time.
+
+Stage 1 — Installation
+
+	The CRD and Operator are installed. Kubernetes learns the custom resource type, and the controller starts running.
+
+Stage 2 — Resource creation
+
+	The user creates a Database CR describing the desired database.
+
+Stage 3 — Watch and reconcile
+
+	The controller detects relevant changes and checks whether the desired resources exist.
+
+Stage 4 — Provisioning
+
+	The Operator creates or updates the required resources and waits for them to become ready.
+
+Stage 5 — Ready
+
+	Once the required health checks succeed, the Operator updates the resource's status and conditions.
+
+Stage 6 — Ongoing management
+
+	The Operator continues reconciling changes, handling failures, and performing supported lifecycle operations.
+
+Remember: this is a conceptual lifecycle, not a strict one-time sequence. Reconciliation continues throughout the resource's life.
+
