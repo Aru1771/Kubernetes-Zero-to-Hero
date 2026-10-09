@@ -18,8 +18,18 @@ A) if we don't have service future in k8s we have to share our pod's ip to acces
    this service acts like a loadbalancer.
 
    one you have created a service we will see that service like: 
-   Eg: payments.defaults.svc
-      service.namespace.svc
+  
+      Eg: payments.default.svc.cluster.local
+
+
+      • payments: The <service-name> defined in your Kubernetes Service manifest.
+      • default: The <namespace> where the service is deployed.
+      • svc: The standard Kubernetes subdomain indicating the resource is a Service.
+      • cluster.local: The default cluster domain suffix (unless customized)
+
+
+
+
 
    by using this service IP we will access the application which are running in pods.
 
