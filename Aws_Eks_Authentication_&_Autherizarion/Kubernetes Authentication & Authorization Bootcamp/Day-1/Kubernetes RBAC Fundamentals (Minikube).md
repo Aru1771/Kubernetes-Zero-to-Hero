@@ -1,17 +1,17 @@
 Day 1: Kubernetes RBAC Fundamentals (Minikube)
+----------------------------------------------
 
 Goal: Understand how Kubernetes decides who can do what.
 
 By the end of today, you'll be able to answer interview questions like:
 
-1. What is RBAC?
-2. What is the difference between Role and ClusterRole?
-3. What is RoleBinding?
-4. How does Kubernetes authorization work?
-5. How do you verify permissions?
+    1. What is RBAC?
+    2. What is the difference between Role and ClusterRole?
+    3. What is RoleBinding?
+    4. How does Kubernetes authorization work?
+    5. How do you verify permissions?
 
-Today's Architecture
-=======================================================================================================================
+Today's Architecture: 
 
                   kubectl get pods
                          │
@@ -24,6 +24,7 @@ Today's Architecture
         Authorization (RBAC: What can you do?)
                          │
                   Allowed / Denied
+
 Today we'll focus only on the Authorization (RBAC) part.
 
 ===================================================================================================================================================================
@@ -38,11 +39,16 @@ Verify:kubectl get nodes
 Step 1: See who you are
 =========================
 
-Run:kubectl config current-context
+Run:
+
+    kubectl config current-context
+
 result : minikube
 
 
-Now check:kubectl config view --minify
+Now check:
+
+    kubectl config view --minify
 
 
 Look for:users:
@@ -53,152 +59,160 @@ Look for:users:
 Right now you are connecting as the minikube user, which has cluster-admin privileges.
 
 
-Step 2: Verify your permissions
-================================
+Step 2: Verify your permissions:
 
-Run: kubectl auth can-i create pods----> yes
-Run: kubectl auth can-i delete namespaces--> yes
+
+
+Run:
+
+    kubectl auth can-i create pods----> yes
+
+Run: 
+
+    kubectl auth can-i delete namespaces--> yes
 
 Question: Why do you think both commands return yes?
 
 Because the default Minikube user has administrative permissions.
 
 
-Step 3: Create a Namespace
-============================
-kubectl create namespace dev
+Step 3: Create a Namespace: 
 
-kubectl get ns
+    kubectl create namespace dev --> to create a ns
+
+    kubectl get ns ---> to see the list of ns
 
 
-Step 4: Create a Role
-=======================
+Step 4: Create a Role:
+
 
 Create a file named developer-role.yaml.
 
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    
+    metadata:
+      name: developer-role
+      namespace: dev
+    
+    rules:
+    - apiGroups: [""]
+      resources:
+        - pods
+        - services
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+     
+kubectl apply -f developer-role.yaml 
 
-metadata:
-  name: developer-role
-  namespace: dev
+kubectl get role -n dev 
 
-rules:
-- apiGroups: [""]
-  resources:
+Understanding the Role: 
+
+
+    resources:
     - pods
     - services
-  verbs:
+
+    verbs:
     - get
     - list
     - watch
     - create
- 
-kubectl apply -f developer-role.yaml
-
-kubectl get role -n dev
-
-Understanding the Role
-======================
-
-resources:
-- pods
-- services
-
-verbs:
-- get
-- list
-- watch
-- create
 
 This role allows:
 
-| Action           | Allowed |
-| ---------------- | ------- |
-| Get Pods         | ✅       |
-| List Pods        | ✅       |
-| Watch Pods       | ✅       |
-| Create Pods      | ✅       |
-| Delete Pods      | ❌       |
-| Delete Namespace | ❌       |
-| View Secrets     | ❌       |
+    | Action           | Allowed |
+    | ---------------- | ------- |
+    | Get Pods         | ✅       |
+    | List Pods        | ✅       |
+    | Watch Pods       | ✅       |
+    | Create Pods      | ✅       |
+    | Delete Pods      | ❌       |
+    | Delete Namespace | ❌       |
+    | View Secrets     | ❌       |
 
 A Role is always limited to a single namespace (dev in this case).
 
-Step 5: Create a Service Account
-=================================
-Instead of creating certificates for a user today, 
-we'll use a ServiceAccount because it's the easiest way to demonstrate RBAC.
+Step 5: Create a Service Account:
 
-Run: kubectl create serviceaccount developer -n dev
+* Instead of creating certificates for a user today, 
+* we'll use a ServiceAccount because it's the easiest way to demonstrate RBAC.
+
+Run: 
+
+    kubectl create serviceaccount developer -n dev
 
 
-kubectl get sa -n dev
+    kubectl get sa -n dev
 
-Step 6: Bind the Role
-======================
+Step 6: Bind the Role:
+
 
 Create developer-rolebinding.yaml.
 
 
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-
-metadata:
-  name: developer-binding
-  namespace: dev
-
-subjects:
-- kind: ServiceAccount
-  name: developer
-  namespace: dev
-
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: developer-role
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    
+    metadata:
+      name: developer-binding
+      namespace: dev
+    
+    subjects:
+    - kind: ServiceAccount
+      name: developer
+      namespace: dev
+    
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: developer-role
 
 Apply it: 
-  kubectl apply -f developer-rolebinding.yaml
 
-  kubectl get rolebinding -n dev
+    kubectl apply -f developer-rolebinding.yaml
+  
+    kubectl get rolebinding -n dev
 
 
-  Step 7: Test Permissions
-  ========================
+Step 7: Test Permissions:
 
   Without switching users, Kubernetes lets you check permissions using impersonation.
 
-   Check if the developer service account can create pods:
+  Check if the developer service account can create pods:
    
 Run:
 
-   kubectl auth can-i create pods \
-  --as=system:serviceaccount:dev:developer \
-  -n devku
+     kubectl auth can-i create pods \
+    --as=system:serviceaccount:dev:developer \
+    -n dev
+  
+    kubectl auth can-i delete pods \
+    --as=system:serviceaccount:dev:developer \
+    -n dev
 
-  kubectl auth can-i delete pods \
-  --as=system:serviceaccount:dev:developer \
-  -n dev
 
+* This is the easiest way to verify RBAC rules without creating kubeconfigs for different users.
 
-  This is the easiest way to verify RBAC rules without creating kubeconfigs for different users.
+What You've Learned Today
 
-  What You've Learned Today
-
-  Role
-      │
-      ▼
-Defines Permissions
-      │
-      ▼
-RoleBinding
-      │
-      ▼
-Assigns Role
-      │
-      ▼
-ServiceAccount (or User/Group)
+        Role
+          │
+          ▼
+    Defines Permissions
+          │
+          ▼
+    RoleBinding
+          │
+          ▼
+    Assigns Role
+          │
+          ▼
+    ServiceAccount (or User/Group)
 
 
 
