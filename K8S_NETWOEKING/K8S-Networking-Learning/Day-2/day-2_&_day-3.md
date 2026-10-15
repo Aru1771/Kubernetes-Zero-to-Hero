@@ -6,11 +6,13 @@ Day -2 Commands:
     1. ip route: it will show How many routes our linux mechine will know.
     2. ip route get <IP>: which route Linux will choose to reach the destination. 
     3. ip rule: it tells Linux which routing table to consult based on policy rules when deciding where to send packets.
+
+Day: 3 Commands:
+
     4. ping — Check ICMP reachability
     5. ip neigh — Inspect the neighbor table
     6. tcpdump — Inspect network packets
 
-Day: 3 Commands:
 
 
 * Today, we’ll learn how Linux decides where to send a packet. We’ll build on what you already know about Pod IPs, network namespaces, and AWS VPC.
