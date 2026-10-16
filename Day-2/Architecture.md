@@ -181,6 +181,25 @@ Kubelet:
       * kubelet is responsible component for maintianing the deployed pod in the worker node.
       * it will check the Pod is running or not. if it is not running it will tells K8s control plain.
 
+Kubelet checks the Pod configuration and starts containers:
+
+      You submit a Pod YAML to the Kubernetes API server.
+      The scheduler assigns the Pod to a worker node.
+      Kubelet on that node observes the assigned Pod specification through the API server.
+      Kubelet coordinates with the container runtime to create and start the containers.
+      Kubelet monitors container health and reports Pod status.
+      Kubelet doesn't independently schedule the Pod or decide which node should run it.
+
+Kubelet monitors Pod health
+
+      Kubelet performs configured health probes and takes the appropriate action.
+      - Liveness probe: Determines whether a container should be restarted.
+      - Readiness probe: Determines whether a container is ready to receive normal Service traffic.
+      - Startup probe: Allows a slow-starting container time to initialize.
+      For example, if your Empower application fails its liveness probe repeatedly, kubelet can restart its container according to the configured probe and restart policy.
+
+
+
 Container Runtime:
 ------------------
        * in k8s we will use "Docker shim", Container D, Cri-O or any other container runtimes which implement k8s container interface.
