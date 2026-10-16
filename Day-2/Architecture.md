@@ -170,23 +170,30 @@ in k8s the lowest level of deployment is POD. Pod is just like a wraper to our c
     
 2 . Data plain components:
    ----------------------
-   1. Kubelet:
-      -------
+   
+Kubelet:
+--------
+      * Kubelet is an agent that runs on every Kubernetes worker node and ensures that the containers described in the Pod specifications assigned to that node are running and healthy.
+      * Kubelet: Makes sure the assigned Pod actually runs on its node.
+      * For example, suppose you deploy your Empower application with three replicas.
+      * Kubernetes schedules those Pods onto worker nodes, and the kubelet on each selected node works to make its assigned Pods run according to their specifications.
+      * It observes the Pod specification assigned to its node and coordinates with the container runtime through the Container Runtime Interface (CRI).
       * kubelet is responsible component for maintianing the deployed pod in the worker node.
       * it will check the Pod is running or not. if it is not running it will tells K8s control plain.
 
-   2. Container Runtime:
-      ------------------
+Container Runtime:
+------------------
        * in k8s we will use "Docker shim", Container D, Cri-O or any other container runtimes which implement k8s container interface.
          
-   3. Kube-Proxy:
-       -----------
-* it will provide networking, IP address to pods and load balacing in k8s. it will usese Ip tables in linux machine.
-* kube-proxy acts as a data-plane controller that writes the routing rules on each node so that the Linux kernel handles the actual traffic routing.
-* kube-proxy runs on every single node in your cluster. It constantly watches the Kubernetes API server for two things:
-  
-         1. When a new Service is created (and assigned a ClusterIP).
-         2. When Pods (Endpoints) are added, removed, or change health status.
+Kube-Proxy:
+-----------
+
+      * it will provide networking, IP address to pods and load balacing in k8s. it will usese Ip tables in linux machine.
+      * kube-proxy acts as a data-plane controller that writes the routing rules on each node so that the Linux kernel handles the actual traffic routing.
+      * kube-proxy runs on every single node in your cluster. It constantly watches the Kubernetes API server for two things:
+        
+               1. When a new Service is created (and assigned a ClusterIP).
+               2. When Pods (Endpoints) are added, removed, or change health status.
   
 * The Rule Maker (Data Plane Role)
   
@@ -230,8 +237,8 @@ Actual Flow:
 
 
 
-4. CoreDNS
-
+CoreDNS
+---------
 
 * The Watcher (Control Plane)
 
