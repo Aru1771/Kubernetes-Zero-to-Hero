@@ -113,6 +113,8 @@ An Important Catch: Subnet Exhaustion
 Because every single pod gets a real, dedicated IP address directly out of your VPC subnet range, EKS clusters can eat through subnet IPs very quickly. If your subnet is too small (e.g., a /24 with only 251 usable IPs), your worker nodes will fail to allocate secondary IPs, and your pods will get stuck in a ContainerCreating or Pending state.
 
 
+Instance Type	vCPU	RAM (GiB)	Max ENIs	IPs per ENI	Max Pods Limit	Best Used For
+
 
 m6i.xlarge	4	16	4	15	58	Production Baseline (Recommended)
 m6i.2xlarge	8	32	4	30	118	High pod density
