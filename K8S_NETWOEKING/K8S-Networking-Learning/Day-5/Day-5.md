@@ -75,4 +75,46 @@ To inspect its logs:
 
 * If you don't currently have an EKS cluster, you can still learn the concepts now and practise the commands later. Avoid changing CNI settings during this lesson.
 
-  
+
+
+
+* When your EKS worker node boots up, it starts with one primary ENI and one primary private IP.
+* To assign real VPC IP addresses to dozens of Kubernetes pods running on that single node, the AWS VPC CNI dynamically attaches additional secondary private IPs to that ENI, and if it runs out of space, it automatically allocates and attaches entirely new secondary ENIs to the EC2 instance.
+
+
+The CNI Pre-allocates a "Warm Pool" of IPs
+----------------------------------------------
+
+The moment your worker node joins the cluster, the AWS VPC CNI DaemonSet communicates with the AWS EC2 API. It immediately allocates a "warm pool" of multiple secondary private IP addresses from your subnet and binds them to the node's primary ENI. When a new pod is scheduled, the CNI instantly assigns one of these pre-allocated secondary IPs directly to the pod's network namespace.
+
+
+The Instance Type Limit (The Guardrail)
+----------------------------------------
+
+An ENI cannot hold an infinite number of IPs. Every EC2 instance type has strict hardware limits hardcoded by AWS.
+
+• A small instance (like a t3.medium) can have a maximum of 3 ENIs, and each ENI can hold 6 private IPs (1 primary + 5 secondary). Max IPs = 18.
+• A larger instance (like a m5.large) can have a maximum of 3 ENIs, and each ENI can hold 10 private IPs. Max IPs = 30.
+
+
+Scaling out with Secondary ENIs
+--------------------------------
+
+When you deploy more pods than a single ENI can handle:
+1. The AWS VPC CNI detects that the primary ENI is running out of secondary IPs.
+2. The CNI automatically calls the AWS API to create a second ENI (Secondary ENI) and attaches it to your EC2 worker node.
+3. It then allocates a brand new batch of secondary private IPs onto that second network card to feed the next wave of pods.
+
+
+
+An Important Catch: Subnet Exhaustion
+--------------------------------------
+
+Because every single pod gets a real, dedicated IP address directly out of your VPC subnet range, EKS clusters can eat through subnet IPs very quickly. If your subnet is too small (e.g., a /24 with only 251 usable IPs), your worker nodes will fail to allocate secondary IPs, and your pods will get stuck in a ContainerCreating or Pending state.
+
+
+
+m6i.xlarge	4	16	4	15	58	Production Baseline (Recommended)
+m6i.2xlarge	8	32	4	30	118	High pod density
+c6i.xlarge	4	8	4	15	58	Compute-heavy (CI/CD, APIs)
+r6i.xlarge	4	32	4	15	58	Memory-heavy (Databases, Caching)
