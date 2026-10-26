@@ -4,39 +4,69 @@ Kubernets Architecture divide into 2 parts:
 1. Control Plain components
 2. Data Palin Componenets
 
-Before going to components concept we have understand one thing if you want to Run a container we need 
-a container Run time without this run time our container will not Run.
+* Before going to components concept we have understand one thing if you want to Run a container we need a container Run time without this run time our container will not Run.
 
-In Docker we have Docker shim as Container run time.
+* In Docker we have Docker shim as Container run time.
 
-Kubernets is adavnaced than Docker it will support most of the advanced Enterprise level concepts like
-Auto scaling, Auto healing, load balancing, clustring with master and worker nodes.
+* Kubernetes is advanced than Docker it will support most of the advanced Enterprise level concepts like Auto scaling, Auto healing, load balancing, clustering with master and worker nodes.
 
-in production we always multi master and multi worker structure.
+* in production we always multi master and multi worker structure.
 
-in k8s our request will not directly go to worker node(Data plane). it will go through master node(control plane).
+* in k8s our request will not directly go to worker node(Data plane). it will go through master node(control plane).
 
-in k8s the lowest level of deployment is POD. Pod is just like a wraper to our container with advances features.
-
-
-
-
+* in k8s the lowest level of deployment is POD. Pod is just like a wraper to our container with advances features.
 
 
 1. Control plain components:
    -------------------------
 
-   1. API-server:
-      ----------
+API-server:
+----------
+
+* The Kubernetes API Server (kube-apiserver) is the central brain and the only entry point to a Kubernetes cluster.
+
       * it will acts as a core component in k8s.
       * it will decide pod creation.
       * it will take all incomming requests from out side from the cluster.
       * it will expose k8s to external world.
      
       * Eg: user is trying to create a Pod. he reaches API server with a command so this API server will decide which worker node is free to deploy this Pod. But to schedule that Pod on thet worker node we will use Scheduler
+
+The 4 Stages of an API Request:
+
+* When you run a command like kubectl apply -f deployment.yaml, the request doesn't just instantly create pods. It must successfully pass through four strict checkpoints inside the API Server:
+
+        [ Request ] ──> ( 1. Authentication ) ──> ( 2. Authorization ) ──> ( 3. Admission Control ) ──> [ Saved to etcd ]
+
+      1. Authentication (Who are you?): The API Server checks your identity using certificates, tokens, or OIDC (like AWS IAM if you are using EKS). If it can't verify who you are, it throws a 401 Unauthorized error.
+         
+      2. Authorization (What are you allowed to do?): It checks your RBAC (Role-Based Access Control) permissions. Do you have the right to create a deployment in this specific namespace? If not, it throws a 403 Forbidden error.
+      
+      3. Admission Control (Is this request safe/valid?): This is where specialized plug-ins check or modify the request. For example, a Mutating Webhook might automatically inject an Istio Envoy sidecar container into your pod, and a Validating Webhook will block the pod if it asks for more memory than your cluster allows.
+      
+      4. Storage (Save to etcd): Once the request passes all validation steps, the API Server converts the YAML data into JSON and stores it securely in etcd.
+
+
+Crucial Architectural Concepts:
+
+It is Stateless: 
+
+      The API Server does not store any data locally on its hard drive. Because it is completely stateless, you can easily scale it horizontally. In a production multi-AZ cluster, AWS EKS automatically deploys multiple copies of the API Server behind a Network Load Balancer (NLB) to ensure high availability.
+
+
+It Uses a Declarative Model (The Controller Pattern)
+
+      The API Server doesn't actually create your pods or configure your AWS ENIs. It simply stores your Desired State (e.g., "I want 3 replicas of this billing app").
+      Other background workers called Controllers (like the kube-controller-manager or the aws-node daemonset) constantly watch the API Server to see what the desired state is, compare it to the Current State on the worker nodes, and make changes to match them.      
+
+
+The Kubelet Connection
+
+      Every single worker node runs a tiny agent called the Kubelet. The Kubelet establishes a continuous secure stream (using HTTP/2 web sockets) directly to the API Server. It watches for any pods assigned to its specific node, spins them up, and continuously reports back the health of those containers to the API Server.
         
-    2. Scheduler:
-       ---------
+  
+Scheduler:
+---------
         * it will responsible for scheduling a Pods and resources in K8S.
 
     3. ECTD:
