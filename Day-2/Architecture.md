@@ -67,7 +67,27 @@ The Kubelet Connection
   
 Scheduler:
 ---------
-        * it will responsible for scheduling a Pods and resources in K8S.
+       
+* it will responsible for scheduling a Pods and resources in K8S.
+* The Kubernetes Scheduler is a control-plane component that decides which worker node should run a newly created Pod.
+
+<img width="972" height="712" alt="image" src="https://github.com/user-attachments/assets/14c85cf5-ad4a-4362-a528-87892c6bcaf7" />
+
+* How does the scheduler choose a node?
+
+It checks several things:
+
+      CPU and memory: Does the node have enough available resources for the Pod's requests?
+      Taints and tolerations: Is the Pod allowed to run on that node?
+      Node selectors and affinity: Does the node match the Pod's placement rules?
+      Pod affinity and anti-affinity: Should the Pod run near or away from other Pods?
+      Topology spread constraints: Should Pods be distributed across nodes or availability zones?
+
+* The scheduler filters out unsuitable nodes, then scores the remaining candidates and selects a node.
+
+<img width="982" height="737" alt="image" src="https://github.com/user-attachments/assets/071bb182-819d-4324-b42e-1f4ba7a28896" />
+
+
 
     3. ECTD:
        -----
