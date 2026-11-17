@@ -52,6 +52,10 @@ Result:
     Worker-2: empty
     Worker-3: empty
 
+
+<img width="947" height="220" alt="image" src="https://github.com/user-attachments/assets/b08af228-f2d1-4156-82b1-d52117c33868" />
+
+
 Pod Anti-Affinity example:
 ----------------------------
 
