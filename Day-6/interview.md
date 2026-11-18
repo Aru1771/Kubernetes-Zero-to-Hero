@@ -6,3 +6,18 @@ We can manually scale Pods or configure HPA for automatic scaling.
 For stable networking and load balancing across Pods, we use Kubernetes Services."
 
 
+IMP CMD'S:
+
+kubectl rollout status deployment nginx
+
+
+ | Command                                                 | Purpose                          |
+ | ------------------------------------------------------- | -------------------------------- |
+ | `kubectl rollout status deployment nginx`               | Check rollout progress           |
+ | `kubectl rollout history deployment nginx`              | View revision history            |
+ | `kubectl rollout undo deployment nginx`                 | Roll back                        |
+ | `kubectl rollout undo deployment nginx --to-revision=2` | Roll back to a specific revision |
+ | `kubectl rollout pause deployment nginx`                | Pause rollout                    |
+ | `kubectl rollout resume deployment nginx`               | Resume rollout                   |
+
+
