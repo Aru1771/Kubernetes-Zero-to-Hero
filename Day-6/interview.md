@@ -21,3 +21,6 @@ kubectl rollout status deployment nginx
  | `kubectl rollout resume deployment nginx`               | Resume rollout                   |
 
 
+<img width="961" height="352" alt="image" src="https://github.com/user-attachments/assets/cfd32c3d-a62e-4459-84f6-0fd2b8bc3fbb" />
+
+<img width="912" height="496" alt="image" src="https://github.com/user-attachments/assets/31121840-3b53-46f2-be8c-81ae640ad9eb" />
