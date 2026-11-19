@@ -90,3 +90,4 @@ So, in summary:
 
 This gave us separate recovery mechanisms for the Kubernetes control-plane state and the application/data layer.
 
+<img width="960" height="757" alt="image" src="https://github.com/user-attachments/assets/2996758a-8068-4108-897c-c6fcbb313f58" />
