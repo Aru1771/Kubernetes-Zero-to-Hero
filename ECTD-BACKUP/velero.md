@@ -89,3 +89,9 @@ For EKS, use the supported CSI Snapshot Controller EKS add-on where available ra
           --backup-location-config region=us-east-1 \
           --features=EnableCSI
 Replace <version> with the Velero AWS plugin version compatible with your Velero version.
+
+
+
+* With Velero CSI integration, Velero can create the required VolumeSnapshot resources automatically during a backup. You don't normally need to manually create one for every backup.
+
+<img width="962" height="751" alt="image" src="https://github.com/user-attachments/assets/d237c4ef-5c9f-4b8d-b7bc-4ff2cdae9566" />
