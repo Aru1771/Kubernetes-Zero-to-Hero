@@ -31,23 +31,32 @@ A) if we don't have service future in k8s we have to share our pod's ip to acces
 
 
 
-   by using this service IP we will access the application which are running in pods.
+* By using this service IP we will access the application which are running in pods.
 
-   once request recieaved the service then kubeproxy will distribute those requests to pods.
+* Once request recieaved the service then kubeproxy will distribute those requests to pods.
 
-   Hear we have one doubt:
-  ------------------------
-if the new pod was created the IP will be change so service also will face same issue.how it 
-will be over comed.
+* What exactly does kube-proxy do?
 
-it will comes with Service Discovery process:
+      1. Watches Kubernetes Services and EndpointSlices.
+      2. Maintains networking rules on each node.
+      3. When traffic reaches a Service IP, those rules select an eligible backend Pod.
+      4. Traffic is forwarded to that Pod.
+      Important: kube-proxy generally programs networking rules; the Linux kernel handles packet forwarding and connection selection.
+
+Hear we have one doubt:
+------------------------
+
+* if the new pod was created the IP will be change so service also will face same issue.how it will be over comed.
+* it will comes with Service Discovery process
 * means this services will track the applications with labeles not with IP address.
 * afert a pod creash new pod will be created with new IP. but the lable will be the same for all pods.
 
 
-to expose our app to outside world. we have 3 main types.
-1. cluster ip: if you use this we can access app only inside the cluster
-2. nodepot: if we use this we can access the app with in the organization. simply how have access to vpc.
+To expose our app to outside world. we have 3 main types:
+----------------------------------------------------------
+
+1. Cluster ip: if you use this we can access app only inside the cluster
+2. Nodepot: if we use this we can access the app with in the organization. simply how have access to vpc.
 3. load balacer: by using this we can get one elastic ip addreess. with the ip we can access it from out side.
 
 
@@ -62,9 +71,6 @@ if we are using minikune for nodeport we have to do port forwording.
 
 Kubeshark to see the traffic flow in the our cluster
 
-
-
- 
 if you in minikube and you have exposed a servive with nord port:
 --------------------------------------------------------------------
 
@@ -91,7 +97,7 @@ Services By piyush:
 * if you have a front-end pods, back-end pods and db.
 * to expose a front-end pods to outer world we can use nodeport service.
 * if you create a service with nodeport we will access the fe-pods with nodeip:nodeport we will get from the nodeport servive.
-* we can alos give a specific nodeport in service of you want. so the range is b/w 30000-32767.
+* we can also give a specific nodeport in service of you want. so the range is b/w 30000-32767.
 
 Nodeport-service np-svc.yaml
 ------------------------------
@@ -158,7 +164,7 @@ LoadBalancerIP:
 
 * In real time we don't want to access the application with NodeportIP's.
 * we need a static domine name like myapp.com
-* so for thet we have to expose our service in LoadBalancer Mode.
+* so for that we have to expose our service in LoadBalancer Mode.
 *  it will create one external IP
 
   
